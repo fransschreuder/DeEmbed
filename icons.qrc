@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>deembed.svg</file>
+    </qresource>
+</RCC>

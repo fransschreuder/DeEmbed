@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CalStdsDialog</class>
+ <widget class="QDialog" name="CalStdsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>478</width>
+    <height>289</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QComboBox" name="comboStd">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="buttonDelete">
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="buttonNew">
+       <property name="text">
+        <string>New</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QPushButton" name="buttonRename">
+       <property name="text">
+        <string>Rename</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabShort">
+      <attribute name="title">
+       <string>Short</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelL0">
+         <property name="text">
+          <string>L0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="labelShortLoss">
+         <property name="text">
+          <string>Loss (dB)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QScienceSpinBox" name="spinL0">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QScienceSpinBox" name="spinL1">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="labelShortLossHz">
+         <property name="text">
+          <string>Loss (dB/Hz)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <widget class="QScienceSpinBox" name="spinShortLoss">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5">
+        <widget class="QScienceSpinBox" name="spinShortLossHz">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QScienceSpinBox" name="spinL2">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelL1">
+         <property name="text">
+          <string>&lt;p&gt;L1 &amp;middot; f&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="labelL2">
+         <property name="text">
+          <string>&lt;p&gt;L2 &amp;middot; f&lt;sup&gt;2&lt;/sup&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="labelL3">
+         <property name="text">
+          <string>&lt;p&gt;L3 &amp;middot; f&lt;sup&gt;3&lt;/sup&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QScienceSpinBox" name="spinL3">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="QLabel" name="labelShortLength">
+         <property name="text">
+          <string>Length (m)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="5">
+        <widget class="QScienceSpinBox" name="spinShortLength">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabOpen">
+      <attribute name="title">
+       <string>Open</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelC0">
+         <property name="text">
+          <string>C0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QScienceSpinBox" name="spinC0">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="labelOpenLoss">
+         <property name="text">
+          <string>Loss (dB)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QScienceSpinBox" name="spinOpenLoss">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelC1">
+         <property name="text">
+          <string>&lt;p&gt;C1 &amp;middot; f&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QScienceSpinBox" name="spinC1">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="labelOpenLossHz">
+         <property name="text">
+          <string>Loss (dB/Hz)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QScienceSpinBox" name="spinOpenLossHz">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelC2">
+         <property name="text">
+          <string>&lt;p&gt;C2 &amp;middot; f&lt;sup&gt;2&lt;/sup&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QScienceSpinBox" name="spinC2">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="labelOpenLength">
+         <property name="text">
+          <string>Length (m)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QScienceSpinBox" name="spinOpenLength">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="labelC3">
+         <property name="text">
+          <string>&lt;p&gt;C3 &amp;middot; f&lt;sup&gt;3&lt;/sup&gt;&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QScienceSpinBox" name="spinC3">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabLoad">
+      <attribute name="title">
+       <string>Load</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelR">
+         <property name="text">
+          <string>&lt;p&gt;R (&amp;Omega;)&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QScienceSpinBox" name="spinR">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelL">
+         <property name="text">
+          <string>&lt;p&gt;L (H)&lt;/p&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QScienceSpinBox" name="spinL">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabThrough">
+      <attribute name="title">
+       <string>Through</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelThroughLoss">
+         <property name="text">
+          <string>Loss (dB)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QScienceSpinBox" name="spinThroughLoss">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelThroughLossHz">
+         <property name="text">
+          <string>Loss (dB/Hz)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QScienceSpinBox" name="spinThroughLossHz">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelThroughLength">
+         <property name="text">
+          <string>Length (m)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QScienceSpinBox" name="spinThroughLength">
+         <property name="minimum">
+          <double>-2.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QScienceSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>qsciencespinbox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
