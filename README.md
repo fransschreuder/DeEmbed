@@ -8,9 +8,10 @@ If you create 1 or 2 port s-parameter files from your cables (through + isolatio
 By default the application shows the data in a smith chart, but different charts are supported (Db, phase, magnitude, VSWR, polar and some combinations).
 
 ##Compiling
+```
 cd DeEmbed
 mkdir build
 cd build
 qmake ..
 make
-
+```
