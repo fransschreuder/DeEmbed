@@ -44,7 +44,7 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
         double LossdBShort=m_CalStd->LossdBShort;
         double LossdBHzShort=m_CalStd->LossdBHzShort;
 		double c = 299792458;
-		complex_t Zsp=complex_t(2*M_PI*f[i]*(L0+L1*f[i]+L2*pow(f[i],2)+L3*pow(f[i],3)));
+		complex_t Zsp=complex_t(0,2*M_PI*f[i]*(L0+L1*f[i]+L2*pow(f[i],2)+L3*pow(f[i],3)));
 		complex_t Gsp=((Zsp-(complex_t(50,0))/(Zsp+complex_t(50,0))));
 		double wl=c/f[i];
         Gsp = Gsp * exp(complex_t(0,2*M_PI*(LengthShort/wl))); //apply electrical length
