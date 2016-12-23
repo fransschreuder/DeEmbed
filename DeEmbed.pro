@@ -45,3 +45,24 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     icons.qrc
+
+isEmpty(PREFIX) {
+ PREFIX = /usr
+}
+
+DESK.files = DeEmbed.desktop
+DESK.path = $${PREFIX}/share/applications
+
+ICO.files = deembed.svg
+ICO.path = $${PREFIX}/share/pixmaps
+
+target.path = $${PREFIX}/bin
+
+EXAMPLES.files = examples/*
+EXAMPLES.path = $${PREFIX}/share/DeEmbed/examples
+
+INSTALLS += target
+INSTALLS += ICO
+INSTALLS += DESK
+INSTALLS += EXAMPLES
+

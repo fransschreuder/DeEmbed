@@ -146,8 +146,63 @@ void MainWindow::loadFile(const QString& path)
             spar = file.Load3P(path.toUtf8().data());
         else //S2P loads 1 and 2 port files.
             spar = file.Load2P(path.toUtf8().data());
-        ui->chart->PutSpar(spar,-1, filename);
 
+        for(int i=0; i<(int)ui->chart->GetSpars().size(); i++)
+        {
+
+            int size = ui->chart->GetSpars()[i].S.size();
+            if(size<(int)spar.S.size()) //Chart has less data, extend to spar.size
+            {
+                spar_t ResizedSpar = ui->chart->GetSpars()[i];
+                ResizedSpar.S.resize(spar.S.size());
+                for(int j=0; j<(int)spar.S.size(); j++)
+                {
+                    ResizedSpar.S[j].resize(spar.S.size());
+                    for(int k=0; k<(int)spar.S.size(); k++)
+                    {
+                        ResizedSpar.S[j][k].resize(ResizedSpar.S[0][0].size(), complex_t(0,0)); //give all new sparameters the same NOP
+                    }
+                }
+                ui->chart->PutSpar(ResizedSpar, i, ui->chart->GetSparNames()[i]); //replace with resized s-parameter
+            }
+            else if (size > (int)spar.S.size())
+            {
+                spar.S.resize(size);
+                for(int j=0; j<size; j++)
+                {
+                    spar.S[j].resize(size);
+                    for(int k=0; k<(int)spar.S.size(); k++)
+                    {
+                        spar.S[j][k].resize(spar.S[0][0].size(), complex_t(0,0)); //give all new sparameters the same NOP
+                    }
+                }
+            }
+            if(spar.f.size()!=ui->chart->GetSpars()[i].f.size()||spar.f[0]!=ui->chart->GetSpars()[i].f[0]||spar.f.back()!=ui->chart->GetSpars()[i].f.back())
+            {
+                double fStart, fStop;
+                int nop;
+                if(ui->chart->GetSpars()[i].f[0]<spar.f[0])
+                    fStart = ui->chart->GetSpars()[i].f[0];
+                else
+                    fStart = spar.f[0];
+
+                if(ui->chart->GetSpars()[i].f.back()>spar.f.back())
+                    fStop = ui->chart->GetSpars()[i].f.back();
+                else
+                    fStop = spar.f.back();
+
+                if(ui->chart->GetSpars()[i].f.size()>spar.f.size())
+                    nop = ui->chart->GetSpars()[i].f.size();
+                else
+                    nop = spar.f.size();
+
+                ui->chart->PutSpar(ui->chart->TrimSpar(ui->chart->GetSpars()[i], fStart, fStop, nop), i, ui->chart->GetSparNames()[i]);
+                spar = ui->chart->TrimSpar(spar, fStart, fStop, nop);
+            }
+
+        }
+        ui->chart->PutSpar(spar,-1, filename);
+        m_calibrator.TrimCal(m_cal, spar.f[0],spar.f.back(), spar.f.size(), &m_cal);
         spar_t calSpar = m_calibrator.Cal(spar, m_cal);
         ui->chart->PutSpar(calSpar, -1, filename+"(cal)");
         adjustForCurrentFile(path);
@@ -301,8 +356,12 @@ void MainWindow::OnCalStdChanged()
             }
         }
     }
+    if(spars.size()>0)
+        if(m_cal.f.size()!=spars[0].f.size()||m_cal.f[0]!=spars[0].f[0]||m_cal.f.back()!=spars[0].f.back()) //frequency range does not match, trim calibration set.
+            m_calibrator.TrimCal(m_cal, spars[0].f[0], spars[0].f.back(), spars[0].f.size(), &m_cal);
     for(int i=0; i<(int)indexesUncal.size(); i++)
     {
+
         spar_t calibrated = m_calibrator.Cal(spars[indexesUncal[i]], m_cal);
         ui->chart->PutSpar(calibrated, indexesCal[i], names[indexesCal[i]]);
     }

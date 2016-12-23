@@ -1,0 +1,15 @@
+Source: DeEmbed
+Section: misc
+Priority: optional
+Maintainer: Frans Schreuder <info@schreuderelectronics.com>
+Build-Depends: debhelper (>=9), qt5-default, qt5-qmake 
+Standards-Version: 3.9.6
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://anonscm.debian.org/collab-maint/DeEmbed.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/DeEmbed.git
+
+Package: DeEmbed
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, gksu
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>

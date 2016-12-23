@@ -25,7 +25,7 @@ using namespace std;
 CalSpar::CalSpar()
 {
 }
-
+///! MICROWAVE & RF CIRCUITS: Analysis, Design, Fabrication, & Measurement 7-11
 vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& shortS1P, vector<complex_t>& openS1P, vector<complex_t>& loadS1P, vector<double>& f)
 {
     vector <complex_t> calS1P;

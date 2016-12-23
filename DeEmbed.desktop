@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=DeEmbed
+Comment=DeEmbed raw S-parameters (TouchStone files) to calibrated data
+Exec=DeEmbed
+Icon=deembed.svg
+Terminal=false
+
+Type=Application
+Categories=System
+StartupNotify=false

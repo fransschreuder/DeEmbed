@@ -50,6 +50,9 @@ public:
     void RemoveSpar(QString name);
     void RemoveSpar(int index);
     void RemovePlot(int index1, int index2);
+
+    spar_t TrimSpar(spar_t spar, double startfreq, double stopfreq, int NOP);
+
     vector<spar_t> GetSpars(void)
     {
         return m_spars;
@@ -122,7 +125,7 @@ private:
     int m_xoffset, m_yoffset; //offset to pan smith chart and polar.
     double m_startfreq;
     double m_stopfreq;
-    spar_t TrimSpar(spar_t spar, double startfreq, double stopfreq, int NOP);
+
     bool m_MarkerOn;
     complex_t PosToS(QPointF pos);
     QPointF SToPos(complex_t S);
