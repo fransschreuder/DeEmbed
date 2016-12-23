@@ -10,7 +10,7 @@ Homepage: <insert the upstream URL, if relevant>
 
 Package: deembed
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5svg5
 Description: Calibrate TouchStone S-Parameter files
  DeEmbed is a GUI application that can read raw S-Parameter files in 
  TouchStone format There is support for 1 to 4 port s-parameter files. 
