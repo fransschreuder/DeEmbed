@@ -17,7 +17,7 @@ fi
 
 # Author: Frans Schreuder <info@schreuderelectronics.com>
 
-DESC="DeEmbed"
+DESC="deembed"
 DAEMON=/usr/bin/DeEmbed
 
 # This is an example to start a single forking daemon capable of writing

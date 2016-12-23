@@ -1,13 +1,13 @@
 DISTS="trusty xenial yakkety"
 STRRELEASE=$(cat version.h |grep DEEMBED_VERSION)
 RELEASE="${STRRELEASE##* }"
-git clone . ../DeEmbed-$RELEASE
+git clone . ../deembed-$RELEASE
 cd ..
-cd DeEmbed-$RELEASE
+cd deembed-$RELEASE
 rm -rf .git
 cd ..
-tar -zcvf DeEmbed_$RELEASE.orig.tar.gz DeEmbed-$RELEASE
-cd DeEmbed-$RELEASE
+tar -zcvf deembed_$RELEASE.orig.tar.gz deembed-$RELEASE
+cd deembed-$RELEASE
 COUNT=0
 for DIST in ${DISTS} ; do
 	COUNT=$(($COUNT-1))

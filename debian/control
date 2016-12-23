@@ -1,4 +1,4 @@
-Source: DeEmbed
+Source: deembed
 Section: misc
 Priority: optional
 Maintainer: Frans Schreuder <info@schreuderelectronics.com>
@@ -8,7 +8,7 @@ Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://anonscm.debian.org/collab-maint/DeEmbed.git
 #Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/DeEmbed.git
 
-Package: DeEmbed
+Package: deembed
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gksu
 Description: <insert up to 60 chars description>
