@@ -1,5 +1,5 @@
 #!/bin/sh
-# postrm script for wDeEmbed
+# postrm script for deembed
 #
 # see: dh_installdeb(1)
 

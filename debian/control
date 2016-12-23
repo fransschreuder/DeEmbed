@@ -2,14 +2,26 @@ Source: deembed
 Section: misc
 Priority: optional
 Maintainer: Frans Schreuder <info@schreuderelectronics.com>
-Build-Depends: debhelper (>=9), qt5-default, qt5-qmake 
+Build-Depends: debhelper (>=9), qt5-default, qt5-qmake
 Standards-Version: 3.9.6
 Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://anonscm.debian.org/collab-maint/DeEmbed.git
-#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/DeEmbed.git
+#Vcs-Git: https://github.com/fransschreuder/DeEmbed.git
+#Vcs-Browser: https://github.com/fransschreuder/DeEmbed
 
 Package: deembed
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gksu
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Calibrate TouchStone S-Parameter files
+DeEmbed
+
+DeEmbed is a GUI application that can read raw S-Parameter files in 
+TouchStone format There is support for 1 to 4 port s-parameter files. 
+The s-parameters can be de-embedded using the SOLTI (Short, Open, Load, 
+Through, Isolation) method. If you create 1 or 2 port s-parameter files 
+from your cables (through + isolation) and measure 1-port s-parameter 
+files of a short, open and load, the original DUT can be shown in the 
+different graphs as if they were measured without cables.
+
+By default the application shows the data in a smith chart, but 
+different charts are supported (Db, phase, magnitude, VSWR, polar and 
+some combinations).

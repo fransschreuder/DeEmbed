@@ -1,5 +1,5 @@
 #!/bin/sh
-# prerm script for DeEmbed
+# prerm script for deembed
 #
 # see: dh_installdeb(1)
 

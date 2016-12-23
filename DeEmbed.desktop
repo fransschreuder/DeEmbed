@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=DeEmbed
 Comment=DeEmbed raw S-parameters (TouchStone files) to calibrated data
-Exec=DeEmbed
+Exec=deembed
 Icon=deembed.svg
 Terminal=false
 

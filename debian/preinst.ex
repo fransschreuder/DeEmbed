@@ -1,5 +1,5 @@
 #!/bin/sh
-# preinst script for DeEmbed
+# preinst script for deembed
 #
 # see: dh_installdeb(1)
 

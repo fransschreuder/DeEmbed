@@ -11,29 +11,29 @@ version=4
 
 # HTTP site (basic)
 #http://example.com/downloads.html \
-#  files/qlshw-([\d\.]+)\.tar\.gz debian uupdate
+#  files/deembed-([\d\.]+)\.tar\.gz debian uupdate
 
 # Uncommment to examine a FTP server
-#ftp://ftp.example.com/pub/qlshw-(.*)\.tar\.gz debian uupdate
+#ftp://ftp.example.com/pub/deembed-(.*)\.tar\.gz debian uupdate
 
 # SourceForge hosted projects
-# http://sf.net/qlshw/ qlshw-(.*)\.tar\.gz debian uupdate
+# http://sf.net/deembed/ deembed-(.*)\.tar\.gz debian uupdate
 
 # GitHub hosted projects
 #opts="filenamemangle="s%(?:.*?)?v?(\d[\d.]*)\.tar\.gz%<project>-$1.tar.gz%" \
-#   https://github.com/<user>/qlshw/tags \
+#   https://github.com/<user>/deembed/tags \
 #   (?:.*?/)?v?(\d[\d.]*)\.tar\.gz debian uupdate
 
 # PyPI
-# https://pypi.python.org/packages/source/<initial>/qlshw/ \
-#   qlshw-(.+)\.tar\.gz debian uupdate
+# https://pypi.python.org/packages/source/<initial>/deembed/ \
+#   deembed-(.+)\.tar\.gz debian uupdate
 
 # Direct Git
-# opts="mode=git" http://git.example.com/qlshw.git \
+# opts="mode=git" http://git.example.com/deembed.git \
 #   refs/tags/v([\d\.]+) debian uupdate
 
 
 
 
 # Uncomment to find new files on GooglePages
-# http://example.googlepages.com/foo.html qlshw-(.*)\.tar\.gz
+# http://example.googlepages.com/foo.html deembed-(.*)\.tar\.gz

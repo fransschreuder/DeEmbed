@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for DeEmbed
+# postinst script for deembed
 #
 # see: dh_installdeb(1)
 
