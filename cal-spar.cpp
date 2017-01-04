@@ -20,16 +20,19 @@ software is free software: you can redistribute it and/or modify it
 #include <iostream>
 #include "typedefs.h"
 #include "spline.h"
+#include "vna-math.h"
 using namespace std;
+
+#define METHOD_AGILENT
 
 CalSpar::CalSpar()
 {
 }
-///! MICROWAVE & RF CIRCUITS: Analysis, Design, Fabrication, & Measurement 7-11
+
 vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& shortS1P, vector<complex_t>& openS1P, vector<complex_t>& loadS1P, vector<double>& f)
 {
     vector <complex_t> calS1P;
-	complex_t M1, M2, P1, P2, Q1, Q2, A, B, C;
+
 	
 
 	calS1P.resize(rawS1P.size());			//output of function
@@ -45,8 +48,8 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
         double LossdBHzShort=m_CalStd->LossdBHzShort;
 		double c = 299792458;
 		complex_t Zsp=complex_t(0,2*M_PI*f[i]*(L0+L1*f[i]+L2*pow(f[i],2)+L3*pow(f[i],3)));
-		complex_t Gsp=((Zsp-(complex_t(50,0))/(Zsp+complex_t(50,0))));
-		double wl=c/f[i];
+        complex_t Gsp=ZtoS(Zsp/complex_t(50,0));
+        double wl=c/f[i];
         Gsp = Gsp * exp(complex_t(0,2*M_PI*(LengthShort/wl))); //apply electrical length
         Gsp = Gsp * pow(10,-1*LossdBShort/20) * pow(10,(-1*LossdBHzShort*f[i])/20); //apply Loss (dB) and Loss (dB/Hz)
         //Gsp = complex_t(-1,0);
@@ -63,7 +66,7 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
 		double LossdBHzOpen=m_CalStd->LossdBHzOpen;
 		
 		complex_t Zop=complex_t(0,-1)/	complex_t(2*M_PI*f[i]*(C0+C1*f[i]+C2*pow(f[i],2)+C3*pow(f[i],3)),0);// impedance for open
-		complex_t Gop=((Zop-complex_t(50,0))/(Zop+complex_t(50,0)));
+        complex_t Gop=ZtoS(Zop/complex_t(50,0));
         if(2*M_PI*f[i]*(C0+C1*f[i]+C2*pow(f[i],2)+C3*pow(f[i],3))==0)
             Gop=complex_t(1,0);
         Gop = Gop * exp(complex_t(0,2*M_PI*(LengthOpen/wl))); //apply electrical length
@@ -73,11 +76,17 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
 		double Ll=m_CalStd->Ll;
 		double Rl=m_CalStd->Rl;
 		complex_t Zlp=complex_t(Rl,2*M_PI*f[i]*Ll);
-		complex_t Glp=((Zlp-complex_t(50,0))/(Zlp+complex_t(50,0)));
+        complex_t Glp=ZtoS(Zlp/complex_t(50,0));
         //Glp = complex_t(0,0);
 
         //Apply standards to s-parameter.
-		M1=shortS1P[i]-openS1P[i];
+
+#ifndef METHOD_AGILENT
+        /**
+         * Method from MICROWAVE & RF CIRCUITS: Analysis, Design, Fabrication, & Measurement 7-11
+         */
+        complex_t M1, M2, P1, P2, Q1, Q2, A, B, C;
+        M1=shortS1P[i]-openS1P[i];
 		M2=openS1P[i]-loadS1P[i];
 		P1=Gsp-Gop;
 		P2=Gop-Glp;
@@ -86,9 +95,31 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
 		A=((Q2*M1)-(Q1*M2))/((P1*Q2)-(P2*Q1));
 		C=((P2*M1)-(P1*M2))/((P2*Q1)-(P1*Q2));
 		B=loadS1P[i]+(Glp*loadS1P[i]*C)-(Glp*A);
-		calS1P[i]=(rawS1P[i]-B)/((complex_t(-1,0)*C*rawS1P[i])+A);
+        calS1P[i]=(rawS1P[i]-B)/((complex_t(-1,0)*C*rawS1P[i])+A);
+#else
+        /**
+         * Method from Agilent: http://www2.electron.frba.utn.edu.ar/~jcecconi/Bibliografia/04%20-%20Param_S_y_VNA/Network_Analyzer_Error_Models_and_Calibration_Methods.pdf
+         * Gm1==e00+G1*Gm1*e11-G1*de
+         * Gm2==e00+G2*Gm2*e11-G2*de
+         * Gm3==e00+G3*Gm3*e11-G3*de
+         * Inverting the 3 equations below gives the resulting equations for e00, e11 and de below.
+         **/
+        complex_t e00, e11, de;
+        complex_t G1, Gm1, G2, Gm2, G3, Gm3;
+        G1 = Gsp;
+        G2 = Gop;
+        G3 = Glp;
+        Gm1 = shortS1P[i];
+        Gm2 = openS1P[i];
+        Gm3 = loadS1P[i];
+        e00 = (G1*G2*(Gm1 - Gm2)*Gm3 - ((Gm1*Gm2 - Gm2*Gm3)*G1 - (Gm1*Gm2 - Gm1*Gm3)*G2)*G3)/(G1*G2*(Gm1 - Gm2) - (G1*(Gm1 - Gm3) - G2*(Gm2 - Gm3))*G3);
+        e11 = -(G3*(Gm1 - Gm2) -  G2*(Gm1 - Gm3) + G1*(Gm2 - Gm3))/(G1*G2*(Gm1 - Gm2) - (G1*(Gm1 - Gm3) -  G2*(Gm2 - Gm3))*G3);
+        de = -(G3*(Gm1 - Gm2)*Gm3 + (Gm1*Gm2 - Gm1*Gm3)*G1 - (Gm1*Gm2 - Gm2*Gm3)*G2)/(G1*G2*(Gm1 - Gm2) - (G1*(Gm1 - Gm3) - G2*(Gm2 - Gm3))*G3);
+        calS1P[i] = (rawS1P[i]-e00)/((rawS1P[i]*e11)-de);
+#endif
+
 	}
-	return calS1P;
+    return calS1P;
 }
 
 vector<complex_t> CalSpar::ThroughIsolationCal(vector<complex_t>& rawS1P, vector<complex_t>& throughS1P, vector<complex_t>& isolationS1P, vector<double>& f)

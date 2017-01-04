@@ -25,7 +25,6 @@ software is free software: you can redistribute it and/or modify it
 #include "touchstone-file.h"
 #include "calstdsdialog.h"
 #include "version.h"
-#include <QDebug>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QFileDialog>
@@ -342,12 +341,10 @@ void MainWindow::OnCalStdChanged()
     {
         if(!names[i].contains("(cal)"))
         {
-            qDebug()<<"Uncalibrated name: "<<names[i];
             for(int j=i; j<(int)names.size(); j++)
             {
                 if(names[i]+"(cal)"==names[j])
                 {
-                    qDebug()<<"Found matching cal spar: "<<names[i]<<", "<<names[j]<<" at "<<i<<", "<<j;
                     indexesUncal.push_back(i);
                     indexesCal.push_back(j);
                     break;
