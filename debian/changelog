@@ -1,3 +1,11 @@
+deembed (1.1-1) trusty; urgency=medium
+
+  * Fixed calibration standard S to Z calculation
+  * Removed debug output
+  * Fixed calculation of de-embedding (Method from Agilent)
+
+ -- Frans Schreuder <info@schreuderelectronics.com>  Wed, 04 Jan 2017 13:59:21 +0100
+
 deembed (1.0-1) trusty; urgency=medium
 
   * Initial release
