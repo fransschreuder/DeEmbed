@@ -23,6 +23,7 @@ software is free software: you can redistribute it and/or modify it
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <locale.h>
 
 #ifdef WIN32
 #include "shlwapi.h"
@@ -34,6 +35,7 @@ int strcasecmp(const char* first, const char* second)
 #endif
 TouchstoneFile::TouchstoneFile ()
 {
+    setlocale(LC_NUMERIC, "C");
 }
 
 TouchstoneFile::~TouchstoneFile ()
