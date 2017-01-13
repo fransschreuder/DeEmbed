@@ -103,6 +103,10 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
          * Gm2==e00+G2*Gm2*e11-G2*de
          * Gm3==e00+G3*Gm3*e11-G3*de
          * Inverting the 3 equations below gives the resulting equations for e00, e11 and de below.
+         * solve([Gm1==e00+G1*Gm1*e11-G1*de, Gm2==e00+G2*Gm2*e11-G2*de, Gm3==e00+G3*Gm3*e11-G3*de], e00, e11, de)
+         * e00 == ((G3*Gm2 - G3*Gm3)*G2*Gm1 - (G2*Gm2*Gm3 - G3*Gm2*Gm3 + (G3*Gm2 - G2*Gm3)*Gm1)*G1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
+         * e11 == ((G2 - G3)*Gm1 - G1*(Gm2 - Gm3) + G3*Gm2 - G2*Gm3)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
+         * de == -(G1*Gm1*(Gm2 - Gm3) + G2*Gm2*Gm3 - G3*Gm2*Gm3 - (G2*Gm2 - G3*Gm3)*Gm1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
          **/
         complex_t e00, e11, de;
         complex_t G1, Gm1, G2, Gm2, G3, Gm3;
@@ -112,9 +116,9 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
         Gm1 = shortS1P[i];
         Gm2 = openS1P[i];
         Gm3 = loadS1P[i];
-        e00 = (G1*G2*(Gm1 - Gm2)*Gm3 - ((Gm1*Gm2 - Gm2*Gm3)*G1 - (Gm1*Gm2 - Gm1*Gm3)*G2)*G3)/(G1*G2*(Gm1 - Gm2) - (G1*(Gm1 - Gm3) - G2*(Gm2 - Gm3))*G3);
-        e11 = -(G3*(Gm1 - Gm2) -  G2*(Gm1 - Gm3) + G1*(Gm2 - Gm3))/(G1*G2*(Gm1 - Gm2) - (G1*(Gm1 - Gm3) -  G2*(Gm2 - Gm3))*G3);
-        de = -(G3*(Gm1 - Gm2)*Gm3 + (Gm1*Gm2 - Gm1*Gm3)*G1 - (Gm1*Gm2 - Gm2*Gm3)*G2)/(G1*G2*(Gm1 - Gm2) - (G1*(Gm1 - Gm3) - G2*(Gm2 - Gm3))*G3);
+        e00 == ((G3*Gm2 - G3*Gm3)*G2*Gm1 - (G2*Gm2*Gm3 - G3*Gm2*Gm3 + (G3*Gm2 - G2*Gm3)*Gm1)*G1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
+        e11 == ((G2 - G3)*Gm1 - G1*(Gm2 - Gm3) + G3*Gm2 - G2*Gm3)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
+        de == -(G1*Gm1*(Gm2 - Gm3) + G2*Gm2*Gm3 - G3*Gm2*Gm3 - (G2*Gm2 - G3*Gm3)*Gm1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
         calS1P[i] = (rawS1P[i]-e00)/((rawS1P[i]*e11)-de);
 #endif
 

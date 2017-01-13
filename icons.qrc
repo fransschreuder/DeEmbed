@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>deembed.svg</file>
+        <file>icons/document-new.svg</file>
+        <file>icons/document-open.svg</file>
+        <file>icons/document-save.svg</file>
     </qresource>
 </RCC>

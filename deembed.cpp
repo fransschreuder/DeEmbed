@@ -51,12 +51,14 @@ MainWindow::MainWindow(QWidget *parent) :
                                      this, SLOT(openRecent()));
         recentFileActionList.append(recentFileAction);
     }
+
+
     recentFilesMenu = new QMenu(tr("Open Recent"));
     saveSparsMenu = new QMenu(tr("Export TouchStone file"));
     ui->menuFile->insertMenu(ui->actionExport_De_embedded_Data, recentFilesMenu);
     QToolButton* openRecentButton=new QToolButton(this);
     openRecentButton->setPopupMode(QToolButton::InstantPopup);
-    openRecentButton->setIcon(QIcon::fromTheme("fileopen"));
+    openRecentButton->setIcon(QIcon(QString(":icons/document-open.svg")));
     openRecentButton->setMenu(recentFilesMenu);
     QWidgetAction* toolButtonAction = new QWidgetAction(this);
     toolButtonAction->setDefaultWidget(openRecentButton);
@@ -65,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QToolButton* saveTouchStoneButton=new QToolButton(this);
     saveTouchStoneButton->setPopupMode(QToolButton::InstantPopup);
-    saveTouchStoneButton->setIcon(QIcon::fromTheme("filesave"));
+    saveTouchStoneButton->setIcon(QIcon(QString(":icons/document-save.svg")));
     saveTouchStoneButton->setMenu(saveSparsMenu);
     QWidgetAction* saveButtonAction = new QWidgetAction(this);
     saveButtonAction->setDefaultWidget(saveTouchStoneButton);
