@@ -124,13 +124,16 @@ void CalDialog::on_buttonBox_accepted()
 
                 }
                 bool TwoPort=false;
-                vector<complex_t> caltrace1, caltrace2;
+                vector<complex_t> caltrace1, caltrace2, caltrace3, caltrace4, nulltrace;
                 if(spar.S.size()>1&&spar.S[1].size()>1&&i>11) //2 port S parameter file, use S21 / S12 for Through / Isolation
                 {
                     TwoPort = true;
 
                     caltrace2=spar.S[1][0]; //S21
                     caltrace1=spar.S[0][1]; //S12
+                    caltrace3=spar.S[0][0]; //S11
+                    caltrace4=spar.S[1][1]; //S22
+                    nulltrace.resize(spar.f.size(),complex_t(0,0));
                 }
                 else
                     caltrace1=spar.S[0][0]; //S11
@@ -187,31 +190,43 @@ void CalDialog::on_buttonBox_accepted()
                 case 12:
                     cal.Through12=caltrace1;
                     (TwoPort)?cal.Through21=caltrace2:caltrace1;
+                    (TwoPort)?cal.Reflect21=caltrace3:nulltrace;
+                    (TwoPort)?cal.Reflect12=caltrace4:nulltrace;
                     cal.P12ThroughDone=true;
                     break;
                 case 13:
                     cal.Through13=caltrace1;
                     (TwoPort)?cal.Through23=caltrace2:caltrace1;
+                    (TwoPort)?cal.Reflect32=caltrace3:nulltrace;
+                    (TwoPort)?cal.Reflect23=caltrace4:nulltrace;
                     cal.P13ThroughDone=true;
                     break;
                 case 14:
                     cal.Through14=caltrace1;
                     (TwoPort)?cal.Through41=caltrace2:caltrace1;
+                    (TwoPort)?cal.Reflect41=caltrace3:nulltrace;
+                    (TwoPort)?cal.Reflect14=caltrace4:nulltrace;
                     cal.P14ThroughDone=true;
                     break;
                 case 15:
                     cal.Through23=caltrace1;
                     (TwoPort)?cal.Through32=caltrace2:caltrace1;
+                    (TwoPort)?cal.Reflect32=caltrace3:nulltrace;
+                    (TwoPort)?cal.Reflect23=caltrace4:nulltrace;
                     cal.P23ThroughDone=true;
                     break;
                 case 16:
                     cal.Through24=caltrace1;
                     (TwoPort)?cal.Through42=caltrace2:caltrace1;
+                    (TwoPort)?cal.Reflect42=caltrace3:nulltrace;
+                    (TwoPort)?cal.Reflect24=caltrace4:nulltrace;
                     cal.P24ThroughDone=true;
                     break;
                 case 17:
                     cal.Through34=caltrace1;
                     (TwoPort)?cal.Through43=caltrace2:caltrace1;
+                    (TwoPort)?cal.Reflect43=caltrace3:nulltrace;
+                    (TwoPort)?cal.Reflect34=caltrace4:nulltrace;
                     cal.P34ThroughDone=true;
                     break;
                 case 18:

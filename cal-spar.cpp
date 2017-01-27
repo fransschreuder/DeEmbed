@@ -29,6 +29,93 @@ CalSpar::CalSpar()
 {
 }
 
+complex_t CalSpar::stdShort(double f)
+{
+    // - - - - - - - - - - model for short - - - - - - - - - - - - - -
+    double L0=m_CalStd->L0;
+    double L1=m_CalStd->L1;
+    double L2=m_CalStd->L2;
+    double L3=m_CalStd->L3;
+    double LengthShort=m_CalStd->LengthShort; //Electrical length in m
+    double LossdBShort=m_CalStd->LossdBShort;
+    double LossdBHzShort=m_CalStd->LossdBHzShort;
+    double c = 299792458;
+    complex_t Zsp=complex_t(0,2*M_PI*f*(L0+L1*f+L2*pow(f,2)+L3*pow(f,3)));
+    complex_t Gsp=ZtoS(Zsp/complex_t(50,0));
+    double wl=c/f;
+    Gsp = Gsp * exp(complex_t(0,2*M_PI*(LengthShort/wl))); //apply electrical length
+    Gsp = Gsp * pow(10,-1*LossdBShort/20) * pow(10,(-1*LossdBHzShort*f)/20); //apply Loss (dB) and Loss (dB/Hz)
+    return Gsp;
+}
+
+complex_t CalSpar::stdOpen(double f)
+{
+    // - - - - - - - - - - model for open
+    double C0=m_CalStd->C0;
+    double C1=m_CalStd->C1;
+    double C2=m_CalStd->C2;
+    double C3=m_CalStd->C3;
+    double LengthOpen=m_CalStd->LengthOpen; //Electrical length in m
+    double LossdBOpen=m_CalStd->LossdBOpen;
+    double LossdBHzOpen=m_CalStd->LossdBHzOpen;
+    double c = 299792458;
+    double wl=c/f;
+    complex_t Zop=complex_t(0,-1)/	complex_t(2*M_PI*f*(C0+C1*f+C2*pow(f,2)+C3*pow(f,3)),0);// impedance for open
+    complex_t Gop=ZtoS(Zop/complex_t(50,0));
+    if(2*M_PI*f*(C0+C1*f+C2*pow(f,2)+C3*pow(f,3))==0)
+        Gop=complex_t(1,0);
+    Gop = Gop * exp(complex_t(0,2*M_PI*(LengthOpen/wl))); //apply electrical length
+    Gop = Gop * pow(10,-1*LossdBOpen/20) * pow(10,(-1*LossdBHzOpen*f)/20); //apply Loss (dB) and Loss (dB/Hz)
+    //Gop = complex_t(1,0);
+    return Gop;
+}
+
+complex_t CalSpar::stdLoad(double f)
+{
+    //- - - - - - - - - - model for load - - - - - - - - - - - - - - -
+    double Ll=m_CalStd->Ll;
+    double Rl=m_CalStd->Rl;
+    complex_t Zlp=complex_t(Rl,2*M_PI*f*Ll);
+    complex_t Glp=ZtoS(Zlp/complex_t(50,0));
+    //Glp = complex_t(0,0);
+    return Glp;
+}
+
+complex_t CalSpar::stdThrough(double f)
+{
+    double LengthThrough=m_CalStd->LengthThrough;
+    double LossdBThrough=m_CalStd->LossdBThrough;
+    double LossdBHzThrough=m_CalStd->LossdBHzThrough;
+    double c = 299792458;
+    double wl=c/f;
+    complex_t Gth(1,0);
+    Gth = Gth * exp(complex_t(0,2*M_PI*(LengthThrough/wl))); //apply electrical length
+    Gth = Gth * pow(10,-1*LossdBThrough/20) * pow(10,(-1*LossdBHzThrough*f)/20); //apply Loss (dB) and Loss (dB/Hz)
+    return Gth;
+}
+
+void CalSpar::Port1ErrorTerms(complex_t G1, complex_t G2, complex_t G3, complex_t Gm1, complex_t Gm2, complex_t Gm3, complex_t* e00, complex_t* e11, complex_t *de)
+{
+    /**
+     * Method from Agilent: http://www2.electron.frba.utn.edu.ar/~jcecconi/Bibliografia/04%20-%20Param_S_y_VNA/Network_Analyzer_Error_Models_and_Calibration_Methods.pdf
+     * Gm1==e00+G1*Gm1*e11-G1*de
+     * Gm2==e00+G2*Gm2*e11-G2*de
+     * Gm3==e00+G3*Gm3*e11-G3*de
+     * Inverting the 3 equations below gives the resulting equations for e00, e11 and de below.
+     * solve([Gm1==e00+G1*Gm1*e11-G1*de, Gm2==e00+G2*Gm2*e11-G2*de, Gm3==e00+G3*Gm3*e11-G3*de], e00, e11, de)
+     * e00 = ((G3*Gm2 - G3*Gm3)*G2*Gm1 - (G2*Gm2*Gm3 - G3*Gm2*Gm3 + (G3*Gm2 - G2*Gm3)*Gm1)*G1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
+     * e11 = ((G2 - G3)*Gm1 - G1*(Gm2 - Gm3) + G3*Gm2 - G2*Gm3)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
+     * de = -(G1*Gm1*(Gm2 - Gm3) + G2*Gm2*Gm3 - G3*Gm2*Gm3 - (G2*Gm2 - G3*Gm3)*Gm1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
+     **/
+
+    ///Directivity
+    *e00 = ((G3*Gm2 - G3*Gm3)*G2*Gm1 - (G2*Gm2*Gm3 - G3*Gm2*Gm3 + (G3*Gm2 - G2*Gm3)*Gm1)*G1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
+    ///Port 2 match
+    *e11 = ((G2 - G3)*Gm1 - G1*(Gm2 - Gm3) + G3*Gm2 - G2*Gm3)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
+    ///de is e00*e11 - (e10*e01)
+    *de = -(G1*Gm1*(Gm2 - Gm3) + G2*Gm2*Gm3 - G3*Gm2*Gm3 - (G2*Gm2 - G3*Gm3)*Gm1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
+}
+
 vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& shortS1P, vector<complex_t>& openS1P, vector<complex_t>& loadS1P, vector<double>& f)
 {
     vector <complex_t> calS1P;
@@ -38,114 +125,72 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
 	calS1P.resize(rawS1P.size());			//output of function
     for(int i=0;i<(int)rawS1P.size();i++)
 	{
-		// - - - - - - - - - - model for short - - - - - - - - - - - - - -
-        double L0=m_CalStd->L0;
-        double L1=m_CalStd->L1;
-        double L2=m_CalStd->L2;
-        double L3=m_CalStd->L3;
-        double LengthShort=m_CalStd->LengthShort; //Electrical length in m
-        double LossdBShort=m_CalStd->LossdBShort;
-        double LossdBHzShort=m_CalStd->LossdBHzShort;
-		double c = 299792458;
-		complex_t Zsp=complex_t(0,2*M_PI*f[i]*(L0+L1*f[i]+L2*pow(f[i],2)+L3*pow(f[i],3)));
-        complex_t Gsp=ZtoS(Zsp/complex_t(50,0));
-        double wl=c/f[i];
-        Gsp = Gsp * exp(complex_t(0,2*M_PI*(LengthShort/wl))); //apply electrical length
-        Gsp = Gsp * pow(10,-1*LossdBShort/20) * pow(10,(-1*LossdBHzShort*f[i])/20); //apply Loss (dB) and Loss (dB/Hz)
-        //Gsp = complex_t(-1,0);
-		                
-		               
-		
-		// - - - - - - - - - - model for open
-		double C0=m_CalStd->C0;
-		double C1=m_CalStd->C1;
-		double C2=m_CalStd->C2;
-		double C3=m_CalStd->C3;
-		double LengthOpen=m_CalStd->LengthOpen; //Electrical length in m
-		double LossdBOpen=m_CalStd->LossdBOpen;
-		double LossdBHzOpen=m_CalStd->LossdBHzOpen;
-		
-		complex_t Zop=complex_t(0,-1)/	complex_t(2*M_PI*f[i]*(C0+C1*f[i]+C2*pow(f[i],2)+C3*pow(f[i],3)),0);// impedance for open
-        complex_t Gop=ZtoS(Zop/complex_t(50,0));
-        if(2*M_PI*f[i]*(C0+C1*f[i]+C2*pow(f[i],2)+C3*pow(f[i],3))==0)
-            Gop=complex_t(1,0);
-        Gop = Gop * exp(complex_t(0,2*M_PI*(LengthOpen/wl))); //apply electrical length
-        Gop = Gop * pow(10,-1*LossdBOpen/20) * pow(10,(-1*LossdBHzOpen*f[i])/20); //apply Loss (dB) and Loss (dB/Hz)
-        //Gop = complex_t(1,0);
-		//- - - - - - - - - - model for load - - - - - - - - - - - - - - -
-		double Ll=m_CalStd->Ll;
-		double Rl=m_CalStd->Rl;
-		complex_t Zlp=complex_t(Rl,2*M_PI*f[i]*Ll);
-        complex_t Glp=ZtoS(Zlp/complex_t(50,0));
-        //Glp = complex_t(0,0);
-
-        //Apply standards to s-parameter.
-
-#ifndef METHOD_AGILENT
-        /**
-         * Method from MICROWAVE & RF CIRCUITS: Analysis, Design, Fabrication, & Measurement 7-11
-         */
-        complex_t M1, M2, P1, P2, Q1, Q2, A, B, C;
-        M1=shortS1P[i]-openS1P[i];
-		M2=openS1P[i]-loadS1P[i];
-		P1=Gsp-Gop;
-		P2=Gop-Glp;
-		Q1=(Gop*openS1P[i]) - (Gsp*shortS1P[i]);
-		Q2=(Glp*loadS1P[i]) - (Gop*openS1P[i]);
-		A=((Q2*M1)-(Q1*M2))/((P1*Q2)-(P2*Q1));
-		C=((P2*M1)-(P1*M2))/((P2*Q1)-(P1*Q2));
-		B=loadS1P[i]+(Glp*loadS1P[i]*C)-(Glp*A);
-        calS1P[i]=(rawS1P[i]-B)/((complex_t(-1,0)*C*rawS1P[i])+A);
-#else
-        /**
-         * Method from Agilent: http://www2.electron.frba.utn.edu.ar/~jcecconi/Bibliografia/04%20-%20Param_S_y_VNA/Network_Analyzer_Error_Models_and_Calibration_Methods.pdf
-         * Gm1==e00+G1*Gm1*e11-G1*de
-         * Gm2==e00+G2*Gm2*e11-G2*de
-         * Gm3==e00+G3*Gm3*e11-G3*de
-         * Inverting the 3 equations below gives the resulting equations for e00, e11 and de below.
-         * solve([Gm1==e00+G1*Gm1*e11-G1*de, Gm2==e00+G2*Gm2*e11-G2*de, Gm3==e00+G3*Gm3*e11-G3*de], e00, e11, de)
-         * e00 == ((G3*Gm2 - G3*Gm3)*G2*Gm1 - (G2*Gm2*Gm3 - G3*Gm2*Gm3 + (G3*Gm2 - G2*Gm3)*Gm1)*G1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
-         * e11 == ((G2 - G3)*Gm1 - G1*(Gm2 - Gm3) + G3*Gm2 - G2*Gm3)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
-         * de == -(G1*Gm1*(Gm2 - Gm3) + G2*Gm2*Gm3 - G3*Gm2*Gm3 - (G2*Gm2 - G3*Gm3)*Gm1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2)
-         **/
+        complex_t Gsp = stdShort(f[i]);
+        complex_t Gop = stdOpen(f[i]);
+        complex_t Glp = stdLoad(f[i]);
         complex_t e00, e11, de;
-        complex_t G1, Gm1, G2, Gm2, G3, Gm3;
-        G1 = Gsp;
-        G2 = Gop;
-        G3 = Glp;
-        Gm1 = shortS1P[i];
-        Gm2 = openS1P[i];
-        Gm3 = loadS1P[i];
-        e00 == ((G3*Gm2 - G3*Gm3)*G2*Gm1 - (G2*Gm2*Gm3 - G3*Gm2*Gm3 + (G3*Gm2 - G2*Gm3)*Gm1)*G1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
-        e11 == ((G2 - G3)*Gm1 - G1*(Gm2 - Gm3) + G3*Gm2 - G2*Gm3)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
-        de == -(G1*Gm1*(Gm2 - Gm3) + G2*Gm2*Gm3 - G3*Gm2*Gm3 - (G2*Gm2 - G3*Gm3)*Gm1)/(((G2 - G3)*Gm1 - G2*Gm2 + G3*Gm3)*G1 + (G3*Gm2 - G3*Gm3)*G2);
+        Port1ErrorTerms(Gsp, Gop, Glp, shortS1P[i], openS1P[i], loadS1P[i], &e00, &e11, &de);
         calS1P[i] = (rawS1P[i]-e00)/((rawS1P[i]*e11)-de);
-#endif
-
 	}
     return calS1P;
 }
 
-vector<complex_t> CalSpar::ThroughIsolationCal(vector<complex_t>& rawS1P, vector<complex_t>& throughS1P, vector<complex_t>& isolationS1P, vector<double>& f)
+void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> throughS21, vector<complex_t> isolationS21,vector<complex_t> reflectS21,
+                                               vector<complex_t> rawS12, vector<complex_t> throughS12, vector<complex_t> isolationS12,vector<complex_t> reflectS12,
+                                               vector<complex_t> rawS11, vector<complex_t> shortS11, vector<complex_t> openS11, vector<complex_t> loadS11,
+                                               vector<complex_t> rawS22, vector<complex_t> shortS22, vector<complex_t> openS22, vector<complex_t> loadS22,
+                                               vector<double> f,
+                                               vector<complex_t>* calS21, vector<complex_t>* calS12)
 {
-	double LengthThrough=m_CalStd->LengthThrough;
-	double LossdBThrough=m_CalStd->LossdBThrough;
-	double LossdBHzThrough=m_CalStd->LossdBHzThrough;
-	double c = 299792458;
-	
-	vector<complex_t> S1P = rawS1P;
-    for(int i=0;i<(int)rawS1P.size();i++)
+
+    *calS21 = rawS21;
+    *calS12 = rawS12;
+
+    for(int i=0;i<(int)rawS21.size();i++)
 	{
-		double wl=c/f[i];
-		complex_t Gth(1,0);
-		Gth = Gth * exp(complex_t(0,2*M_PI*(LengthThrough/wl))); //apply electrical length
-		Gth = Gth * pow(10,-1*LossdBThrough/20) * pow(10,(-1*LossdBHzThrough*f[i])/20); //apply Loss (dB) and Loss (dB/Hz)	
-		S1P[i]=(rawS1P[i]-isolationS1P[i])/(throughS1P[i]-isolationS1P[i]);
-		S1P[i]/=Gth; //apply Calibration Standard
+        complex_t Gth = stdThrough(f[i]);
+        complex_t Gsp = stdShort(f[i]);
+        complex_t Gop = stdOpen(f[i]);
+        complex_t Glp = stdLoad(f[i]);
+        //S1P[i]=(rawS21[i]-isolationS21[i])/(throughS21[i]-isolationS21[i]);
+        //S1P[i]/=Gth; //apply Calibration Standard
 		
+        //S1P[i] =
+        complex_t e00, e11, de;
+        Port1ErrorTerms(Gsp, Gop, Glp, shortS11[i], openS11[i], loadS11[i], &e00, &e11, &de);
+
+        complex_t e_33, e_22, d_e;
+        Port1ErrorTerms(Gsp, Gop, Glp, shortS22[i], openS22[i], loadS22[i], &e_33, &e_22, &d_e);
+
+        //complex_t S11 = (rawS11[i]-e00)/((rawS11[i]*e11)-de);
+
+        complex_t e10e01 = de/(e11*e00);
+        complex_t e_23e_32 = d_e/(e_22*e_33);
+
+        complex_t e30 = isolationS21[i];
+        complex_t e_03 = isolationS12[i];
+
+        complex_t S21M = rawS21[i]/Gth;
+        complex_t S12M = rawS12[i]/Gth;
+
+        complex_t e22 = ((reflectS21[i]/Gth)-e00)/(((reflectS21[i]/Gth)*e11)-de);
+        complex_t e10e32 = ((throughS21[i]/Gth) - e30)*(complex_t(1,0)-(e11*e22));
+
+        complex_t e_11 = ((reflectS12[i]/Gth)-e_33)/(((reflectS12[i]/Gth)*e_22)-d_e);
+        complex_t e_23e_01 = ((throughS12[i]/Gth) - e_03)*(complex_t(1,0)-(e_22*e_11));
+
+        complex_t D = (complex_t(1,0)+((rawS11[i]-e00)/(e10e01))*e11)*
+                      (complex_t(1,0)+((rawS22[i]-e_33)/(e_23e_32))*e_22)-
+                      ((S21M-e30)/e10e32)*
+                      ((S12M-e_03)/e_23e_01)*
+                       e22*e_11;
+
+        (*calS21)[i] = (((S21M-e30)/(e10e32))*(complex_t(1,0)+((rawS22[i]-e_33)/(e_23e_32))*(e_22-e22)))/D;
+        (*calS12)[i] = (((S12M-e_03)/(e_23e_01))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01))*(e11-e_11)))/D;
+
 		
 	}
-	return S1P;
+
 }
 
 
@@ -188,45 +233,64 @@ spar_t CalSpar::Cal(spar_t& S, cal_t& cal)
 
     if(cal.P12ThroughDone&&S.S.size()>1)
 	{
-		Sc.S[1][0]=ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.f);
-		Sc.S[0][1]=ThroughIsolationCal(S.S[0][1], cal.Through12, cal.Isolation12, cal.f);
+        ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
+                            S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
+                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f,
+                            &(Sc.S[1][0]), &(Sc.S[0][1]));
+
 	}
     if(cal.P13ThroughDone&&S.S.size()>2)
 	{
-		Sc.S[2][0]=ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.f);
-		Sc.S[0][2]=ThroughIsolationCal(S.S[0][2], cal.Through13, cal.Isolation13, cal.f);
+        ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
+                            S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
+                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+                            &(Sc.S[2][0]), &(Sc.S[0][2]));
 	}
-    if(cal.P14ThroughDone&&S.S.size()>2)
+    if(cal.P14ThroughDone&&S.S.size()>3)
 	{
-		Sc.S[3][0]=ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.f);
-		Sc.S[0][3]=ThroughIsolationCal(S.S[0][3], cal.Through14, cal.Isolation14, cal.f);
-	}
+        ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
+                            S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
+                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                            &(Sc.S[3][0]), &(Sc.S[0][3]));
+    }
     if(cal.P23ThroughDone&&S.S.size()>2)
 	{
-		Sc.S[2][1]=ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.f);
-		Sc.S[1][2]=ThroughIsolationCal(S.S[1][2], cal.Through23, cal.Isolation23, cal.f);
-	}
-    if(cal.P24ThroughDone&&S.S.size()>2)
+        ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
+                            S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
+                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+                            &(Sc.S[2][1]), &(Sc.S[1][2]));
+    }
+    if(cal.P24ThroughDone&&S.S.size()>3)
 	{
-		Sc.S[3][1]=ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.f);
-		Sc.S[1][3]=ThroughIsolationCal(S.S[1][3], cal.Through24, cal.Isolation24, cal.f);
-	}
-    if(cal.P34ThroughDone&&S.S.size()>2)
+        ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
+                            S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
+                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                            &(Sc.S[3][1]), &(Sc.S[1][3]));
+    }
+    if(cal.P34ThroughDone&&S.S.size()>3)
 	{
-		Sc.S[3][2]=ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.f);
-		Sc.S[2][3]=ThroughIsolationCal(S.S[2][3], cal.Through34, cal.Isolation34, cal.f);
-	}
+        ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
+                            S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
+                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
+                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                            &(Sc.S[3][2]), &(Sc.S[2][3]));
+    }
 	
 	return Sc;
 }
 
-vector<complex_t> CalSpar::Cal(vector<complex_t>& S, int index1, int index2, cal_t& cal)
+vector<complex_t> CalSpar::Cal(spar_t S, int index1, int index2, cal_t& cal)
 {
 	vector<complex_t> Sc;
-	Sc=S;
+    Sc=S.S[index1][index2];
 	if(cal.P1ShortDone&&cal.P1OpenDone&&cal.P1LoadDone&&index1==0&&index2==0)
 	{
-		Sc=SOLCal(S, cal.P1Short, cal.P1Open, cal.P1Load,cal.f);
+        Sc=SOLCal(S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,cal.f);
 	}
 	else 
 	{
@@ -234,7 +298,7 @@ vector<complex_t> CalSpar::Cal(vector<complex_t>& S, int index1, int index2, cal
 	}
 	if(cal.P2ShortDone&&cal.P2OpenDone&&cal.P2LoadDone&&index1==1&&index2==1)
 	{
-		Sc=SOLCal(S, cal.P2Short, cal.P2Open, cal.P2Load,cal.f);
+        Sc=SOLCal(S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f);
 	}
 	else 
 	{
@@ -242,7 +306,7 @@ vector<complex_t> CalSpar::Cal(vector<complex_t>& S, int index1, int index2, cal
 	}
 	if(cal.P3ShortDone&&cal.P3OpenDone&&cal.P3LoadDone&&index1==2&&index2==2)
 	{
-		Sc=SOLCal(S, cal.P3Short, cal.P3Open, cal.P3Load,cal.f);
+        Sc=SOLCal(S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f);
 	}
 	else 
 	{
@@ -250,7 +314,7 @@ vector<complex_t> CalSpar::Cal(vector<complex_t>& S, int index1, int index2, cal
 	}
 	if(cal.P4ShortDone&&cal.P4OpenDone&&cal.P4LoadDone&&index1==3&&index2==3)
 	{
-		Sc=SOLCal(S, cal.P4Short, cal.P4Open, cal.P4Load,cal.f);
+        Sc=SOLCal(S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f);
 	}
 	else 
 	{
@@ -259,34 +323,77 @@ vector<complex_t> CalSpar::Cal(vector<complex_t>& S, int index1, int index2, cal
 
 	if(cal.P12ThroughDone)
 	{
-		if(index1==1&&index2==0)Sc=ThroughIsolationCal(S, cal.Through21, cal.Isolation21, cal.f);
-		if(index1==0&&index2==1)Sc=ThroughIsolationCal(S, cal.Through12, cal.Isolation12, cal.f);
+        vector<complex_t> Sc1, Sc2;
+        if((index1==1&&index2==0)||(index1==0&&index2==1))
+            ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
+                            S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
+                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f,
+                            &Sc1, &Sc2);
+
+        if(index1==1&&index2==0)Sc=Sc1;
+        if(index1==0&&index2==1)Sc=Sc2;
 	}
 	if(cal.P13ThroughDone)
 	{
-		if(index1==2&&index2==0)Sc=ThroughIsolationCal(S, cal.Through31, cal.Isolation31, cal.f);
-		if(index1==0&&index2==2)Sc=ThroughIsolationCal(S, cal.Through13, cal.Isolation13, cal.f);
-	}
+        vector<complex_t> Sc1, Sc2;
+        if((index1==2&&index2==0)||(index1==0&&index2==2))
+            ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
+                                S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
+                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+                            &Sc1, &Sc2);
+
+        if(index1==2&&index2==0)Sc=Sc1;
+        if(index1==0&&index2==2)Sc=Sc2;	}
 	if(cal.P14ThroughDone)
 	{
-		if(index1==3&&index2==0)Sc=ThroughIsolationCal(S, cal.Through41, cal.Isolation41, cal.f);
-		if(index1==0&&index2==3)Sc=ThroughIsolationCal(S, cal.Through14, cal.Isolation14, cal.f);
-	}
+        vector<complex_t> Sc1, Sc2;
+        if((index1==3&&index2==0)||(index1==0&&index2==3))
+            ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
+                                S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
+                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                            &Sc1, &Sc2);
+
+        if(index1==3&&index2==0)Sc=Sc1;
+        if(index1==0&&index2==3)Sc=Sc2;	}
 	if(cal.P23ThroughDone)
 	{
-		if(index1==2&&index2==1)Sc=ThroughIsolationCal(S, cal.Through32, cal.Isolation32, cal.f);
-		if(index1==1&&index2==2)Sc=ThroughIsolationCal(S, cal.Through23, cal.Isolation23, cal.f);
-	}
+        vector<complex_t> Sc1, Sc2;
+        if((index1==2&&index2==1)||(index1==1&&index2==2))
+            ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
+                                S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
+                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+                            &Sc1, &Sc2);
+
+        if(index1==2&&index2==1)Sc=Sc1;
+        if(index1==1&&index2==2)Sc=Sc2;	}
 	if(cal.P24ThroughDone)
 	{
-		if(index1==3&&index2==1)Sc=ThroughIsolationCal(S, cal.Through42, cal.Isolation42, cal.f);
-		if(index1==1&&index2==3)Sc=ThroughIsolationCal(S, cal.Through24, cal.Isolation24, cal.f);
-	}
+        vector<complex_t> Sc1, Sc2;
+        if((index1==3&&index2==1)||(index1==1&&index2==3))
+            ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
+                                S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
+                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                            &Sc1, &Sc2);
+
+        if(index1==3&&index2==1)Sc=Sc1;
+        if(index1==1&&index2==3)Sc=Sc2;	}
 	if(cal.P34ThroughDone)
 	{
-		if(index1==3&&index2==2)Sc=ThroughIsolationCal(S, cal.Through43, cal.Isolation43, cal.f);
-		if(index1==2&&index2==3)Sc=ThroughIsolationCal(S, cal.Through34, cal.Isolation34, cal.f);
-	}
+        vector<complex_t> Sc1, Sc2;
+        if((index1==3&&index2==2)||(index1==2&&index2==3))
+            ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
+                                S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
+                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
+                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                            &Sc1, &Sc2);
+
+        if(index1==3&&index2==2)Sc=Sc1;
+        if(index1==2&&index2==3)Sc=Sc2;	}
 	
 	return Sc;
 }
@@ -337,29 +444,41 @@ cal_t CalSpar::DefaultCal(double startfreq,double stopfreq,int NOP)
 	cal.P4Load.resize(NOP,complex_t(0,0));
 	cal.Through21.resize(NOP,complex_t(1,0));
 	cal.Through12.resize(NOP,complex_t(1,0));
-	cal.Isolation21.resize(NOP,complex_t(0,0));
+    cal.Reflect21.resize(NOP,complex_t(0,0));
+    cal.Reflect12.resize(NOP,complex_t(0,0));
+    cal.Isolation21.resize(NOP,complex_t(0,0));
 	cal.Isolation12.resize(NOP,complex_t(0,0));
-	cal.Through31.resize(NOP,complex_t(1,0));
+    cal.Through31.resize(NOP,complex_t(1,0));
 	cal.Through13.resize(NOP,complex_t(1,0));
-	cal.Isolation31.resize(NOP,complex_t(0,0));
+    cal.Reflect31.resize(NOP,complex_t(0,0));
+    cal.Reflect13.resize(NOP,complex_t(0,0));
+    cal.Isolation31.resize(NOP,complex_t(0,0));
 	cal.Isolation13.resize(NOP,complex_t(0,0));
-	cal.Through41.resize(NOP,complex_t(1,0));
+    cal.Through41.resize(NOP,complex_t(1,0));
 	cal.Through14.resize(NOP,complex_t(1,0));
-	cal.Isolation41.resize(NOP,complex_t(0,0));
+    cal.Reflect41.resize(NOP,complex_t(0,0));
+    cal.Reflect14.resize(NOP,complex_t(0,0));
+    cal.Isolation41.resize(NOP,complex_t(0,0));
 	cal.Isolation14.resize(NOP,complex_t(0,0));
-	cal.Through32.resize(NOP,complex_t(1,0));
+    cal.Through32.resize(NOP,complex_t(1,0));
 	cal.Through23.resize(NOP,complex_t(1,0));
-	cal.Isolation32.resize(NOP,complex_t(0,0));
+    cal.Reflect23.resize(NOP,complex_t(0,0));
+    cal.Reflect32.resize(NOP,complex_t(0,0));
+    cal.Isolation32.resize(NOP,complex_t(0,0));
 	cal.Isolation23.resize(NOP,complex_t(0,0));
-	cal.Through42.resize(NOP,complex_t(1,0));
+    cal.Through42.resize(NOP,complex_t(1,0));
 	cal.Through24.resize(NOP,complex_t(1,0));
-	cal.Isolation42.resize(NOP,complex_t(0,0));
+    cal.Reflect42.resize(NOP,complex_t(0,0));
+    cal.Reflect24.resize(NOP,complex_t(0,0));
+    cal.Isolation42.resize(NOP,complex_t(0,0));
 	cal.Isolation24.resize(NOP,complex_t(0,0));
-	cal.Through43.resize(NOP,complex_t(1,0));
+    cal.Through43.resize(NOP,complex_t(1,0));
 	cal.Through34.resize(NOP,complex_t(1,0));
-	cal.Isolation43.resize(NOP,complex_t(0,0));
+    cal.Reflect43.resize(NOP,complex_t(0,0));
+    cal.Reflect34.resize(NOP,complex_t(0,0));
+    cal.Isolation43.resize(NOP,complex_t(0,0));
 	cal.Isolation34.resize(NOP,complex_t(0,0));
-	return cal;
+    return cal;
 }
 #ifndef CLI_ONLY
 bool CalSpar::TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, cal_t *targetCal)
@@ -422,6 +541,19 @@ bool CalSpar::TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, ca
 	Spline<double, complex_t> SpIsolation41(cal.f, cal.Isolation41);
 	Spline<double, complex_t> SpIsolation42(cal.f, cal.Isolation42);
 	Spline<double, complex_t> SpIsolation43(cal.f, cal.Isolation43);
+
+    Spline<double, complex_t> SpReflect12(cal.f, cal.Reflect12);
+    Spline<double, complex_t> SpReflect13(cal.f, cal.Reflect13);
+    Spline<double, complex_t> SpReflect14(cal.f, cal.Reflect14);
+    Spline<double, complex_t> SpReflect21(cal.f, cal.Reflect21);
+    Spline<double, complex_t> SpReflect23(cal.f, cal.Reflect23);
+    Spline<double, complex_t> SpReflect24(cal.f, cal.Reflect24);
+    Spline<double, complex_t> SpReflect31(cal.f, cal.Reflect31);
+    Spline<double, complex_t> SpReflect32(cal.f, cal.Reflect32);
+    Spline<double, complex_t> SpReflect34(cal.f, cal.Reflect34);
+    Spline<double, complex_t> SpReflect41(cal.f, cal.Reflect41);
+    Spline<double, complex_t> SpReflect42(cal.f, cal.Reflect42);
+    Spline<double, complex_t> SpReflect43(cal.f, cal.Reflect43);
     
 	
 	
@@ -476,6 +608,18 @@ bool CalSpar::TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, ca
         temp_cal.Isolation41.push_back(SpIsolation41[temp_cal.f[i]]);
         temp_cal.Isolation42.push_back(SpIsolation43[temp_cal.f[i]]);
         temp_cal.Isolation43.push_back(SpIsolation43[temp_cal.f[i]]);
+        temp_cal.Reflect12.push_back(SpReflect12[temp_cal.f[i]]);
+        temp_cal.Reflect13.push_back(SpReflect13[temp_cal.f[i]]);
+        temp_cal.Reflect14.push_back(SpReflect14[temp_cal.f[i]]);
+        temp_cal.Reflect21.push_back(SpReflect21[temp_cal.f[i]]);
+        temp_cal.Reflect23.push_back(SpReflect23[temp_cal.f[i]]);
+        temp_cal.Reflect24.push_back(SpReflect24[temp_cal.f[i]]);
+        temp_cal.Reflect31.push_back(SpReflect31[temp_cal.f[i]]);
+        temp_cal.Reflect32.push_back(SpReflect32[temp_cal.f[i]]);
+        temp_cal.Reflect34.push_back(SpReflect34[temp_cal.f[i]]);
+        temp_cal.Reflect41.push_back(SpReflect41[temp_cal.f[i]]);
+        temp_cal.Reflect42.push_back(SpReflect43[temp_cal.f[i]]);
+        temp_cal.Reflect43.push_back(SpReflect43[temp_cal.f[i]]);
 	}
 	*targetCal = temp_cal;
 	return true;

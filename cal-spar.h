@@ -45,11 +45,16 @@ public:
     ///! Executes a Short Open Load (1 port) calibration using a calibration set and cal std.
 	vector<complex_t> SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& shortS1P, vector<complex_t>& openS1P, vector<complex_t>& loadS1P, vector<double>& f);	
     ///! Executes a Through (+isolation) calibration on a 2-port trace (S21, S12, etc)
-	vector<complex_t> ThroughIsolationCal(vector<complex_t>& rawS1P, vector<complex_t>& throughS1P, vector<complex_t>& isolationS1P, vector<double>& f);
+    void ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> throughS21, vector<complex_t> isolationS21,vector<complex_t> reflectS21,
+                                          vector<complex_t> rawS12, vector<complex_t> throughS12, vector<complex_t> isolationS12,vector<complex_t> reflectS12,
+                                          vector<complex_t> rawS11, vector<complex_t> shortS11, vector<complex_t> openS11, vector<complex_t> loadS11,
+                                          vector<complex_t> rawS22, vector<complex_t> shortS22, vector<complex_t> openS22, vector<complex_t> loadS22,
+                                          vector<double> f,
+                                          vector<complex_t>* calS21, vector<complex_t>* calS12);
     ///! Cal executes both SOLCal and ThroughIsolationCal on a dataset
 	spar_t Cal(spar_t& S, cal_t& cal);
     ///! This overloaded Cal executes SOLCal and ThroughIsolationCal on a single trace with 2 indexes in the matrix.
-    vector<complex_t> Cal(vector<complex_t>& S, int index1, int index2, cal_t& cal);
+    vector<complex_t> Cal(spar_t S, int index1, int index2, cal_t& cal);
     ///! Constructor, does nothing.
     CalSpar();
     ///! Returns an empty calibraion set with a given frequency range, this is the ideal / uncalibrated calset.
@@ -64,6 +69,13 @@ public:
 		m_CalStd=CalStd;
 	}
     tCalStd *m_CalStd;
+private:
+    complex_t stdShort(double f);
+    complex_t stdOpen(double f);
+    complex_t stdLoad(double f);
+    complex_t stdThrough(double f);
+    void Port1ErrorTerms(complex_t G1, complex_t G2, complex_t G3, complex_t Gm1, complex_t Gm2, complex_t Gm3, complex_t* e00, complex_t* e11, complex_t *de);
+
 };
 
 #endif // CAL_SPAR_H
