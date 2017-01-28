@@ -70,6 +70,9 @@ public slots:
     ///! Trigger to update the strings in the menu
     void OnChartDataChanged();
 
+    ///! Receive warning messages from calibrator
+    void OnCalibrationWarning(QString warning);
+
 private:
     ///! Form Designer GUI
     Ui::MainWindow *ui;

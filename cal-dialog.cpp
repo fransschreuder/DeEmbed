@@ -111,6 +111,7 @@ void CalDialog::on_buttonBox_accepted()
 
     TouchstoneFile *touchstoneFile = new TouchstoneFile();
     cal_t cal;
+    bool defaultCreated=false;
     for(int i=0; i<(int)lineEdits.size(); i++)
     {
         if(!lineEdits[i]->text().isEmpty()) //something filled in.
@@ -121,7 +122,7 @@ void CalDialog::on_buttonBox_accepted()
                 if(cal.f.size()==0)
                 {
                     cal = CalSpar::DefaultCal(spar.f[0],spar.f[spar.f.size()-1],spar.f.size());
-
+                    defaultCreated = true;
                 }
                 bool TwoPort=false;
                 vector<complex_t> caltrace1, caltrace2, caltrace3, caltrace4, nulltrace;
@@ -268,6 +269,8 @@ void CalDialog::on_buttonBox_accepted()
             }
         }
     }
+    if(!defaultCreated)
+        cal = CalSpar::DefaultCal(1e3, 1e10, 201);
     m_cal = cal;
 }
 
