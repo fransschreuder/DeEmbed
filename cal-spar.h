@@ -21,6 +21,7 @@ software is free software: you can redistribute it and/or modify it
 
 #include "typedefs.h"
 #include <QString>
+#include <QObject>
 
 ///! A load is not a real load, neither is a short. This data object contains properties of realistic standards.
 typedef struct
@@ -39,8 +40,9 @@ typedef struct
 	
 } tCalStd;
 
-class CalSpar
+class CalSpar: public QObject
 {
+    Q_OBJECT
 public:
     ///! Executes a Short Open Load (1 port) calibration using a calibration set and cal std.
 	vector<complex_t> SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& shortS1P, vector<complex_t>& openS1P, vector<complex_t>& loadS1P, vector<double>& f);	
@@ -75,7 +77,8 @@ private:
     complex_t stdLoad(double f);
     complex_t stdThrough(double f);
     void Port1ErrorTerms(complex_t G1, complex_t G2, complex_t G3, complex_t Gm1, complex_t Gm2, complex_t Gm3, complex_t* e00, complex_t* e11, complex_t *de);
-
+signals:
+    void CalibrationWarning(QString warning);
 };
 
 #endif // CAL_SPAR_H

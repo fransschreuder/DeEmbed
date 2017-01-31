@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_cal = calDialog->getCal();
 
     m_calibrator.SetCalStd(&m_calStd);
+    connect(&m_calibrator, SIGNAL(CalibrationWarning(QString)), this, SLOT(OnCalibrationWarning(QString)));
 
     connect(ui->chart, SIGNAL(dataChanged()), this, SLOT(OnChartDataChanged()));
 
@@ -375,4 +376,9 @@ void MainWindow::OnChartDataChanged()
         QAction* action = saveSparsMenu->addAction(names[i]);
         connect(action, SIGNAL(triggered(bool)), this, SLOT(on_actionExport_De_embedded_Data_triggered()));
     }
+}
+
+void MainWindow::OnCalibrationWarning(QString warning)
+{
+    ui->statusBar->showMessage(warning, 60000);
 }

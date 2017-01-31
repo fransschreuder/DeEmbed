@@ -21,6 +21,7 @@ software is free software: you can redistribute it and/or modify it
 #include "typedefs.h"
 #include "spline.h"
 #include "vna-math.h"
+#include <QDebug>
 using namespace std;
 
 #define METHOD_AGILENT
@@ -198,89 +199,149 @@ spar_t CalSpar::Cal(spar_t& S, cal_t& cal)
 {
 	spar_t Sc;
 	Sc=S;
-    if(cal.P1ShortDone&&cal.P1OpenDone&&cal.P1LoadDone&&S.S.size()>0)
-	{
-		Sc.S[0][0]=SOLCal(S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 1 uncalibrated"<<endl;
-	}
-    if(cal.P2ShortDone&&cal.P2OpenDone&&cal.P2LoadDone&&S.S.size()>1)
-	{
-		Sc.S[1][1]=SOLCal(S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 2 uncalibrated"<<endl;
-	}
-    if(cal.P3ShortDone&&cal.P3OpenDone&&cal.P3LoadDone&&S.S.size()>2)
-	{
-		Sc.S[2][2]=SOLCal(S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 3 uncalibrated"<<endl;
-	}
-    if(cal.P4ShortDone&&cal.P4OpenDone&&cal.P4LoadDone&&S.S.size()>2)
-	{
-		Sc.S[3][3]=SOLCal(S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 2 uncalibrated"<<endl;
-	}
+    QStringList warningStrings;
+    if(S.S.size()>0)
+    {
+        if(cal.P1ShortDone&&cal.P1OpenDone&&cal.P1LoadDone)
+        {
+            Sc.S[0][0]=SOLCal(S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,cal.f);
+        }
+        else
+        {
+            warningStrings.push_back("S11");
+        }
+    }
+    if(S.S.size()>1)
+    {
+        if(cal.P2ShortDone&&cal.P2OpenDone&&cal.P2LoadDone)
+        {
+            Sc.S[1][1]=SOLCal(S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f);
+        }
+        else
+        {
+            warningStrings.push_back("S22");
+        }
+    }
+    if(S.S.size()>2)
+    {
+        if(cal.P3ShortDone&&cal.P3OpenDone&&cal.P3LoadDone)
+        {
+            Sc.S[2][2]=SOLCal(S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f);
+        }
+        else
+        {
+            warningStrings.push_back("S33");
+        }
+    }
+    if(S.S.size()>3)
+    {
+        if(cal.P4ShortDone&&cal.P4OpenDone&&cal.P4LoadDone)
+        {
+            Sc.S[3][3]=SOLCal(S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f);
+        }
+        else
+        {
+            warningStrings.push_back("S44");
+        }
+    }
+    if(S.S.size()>1)
+    {
+        if(cal.P12ThroughDone)
+        {
+            ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
+                                S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
+                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f,
+                                &(Sc.S[1][0]), &(Sc.S[0][1]));
 
-    if(cal.P12ThroughDone&&S.S.size()>1)
-	{
-        ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
-                            S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
-                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f,
-                            &(Sc.S[1][0]), &(Sc.S[0][1]));
-
-	}
-    if(cal.P13ThroughDone&&S.S.size()>2)
-	{
-        ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
-                            S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
-                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
-                            &(Sc.S[2][0]), &(Sc.S[0][2]));
-	}
-    if(cal.P14ThroughDone&&S.S.size()>3)
-	{
-        ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
-                            S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
-                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                            &(Sc.S[3][0]), &(Sc.S[0][3]));
+        }
+        else
+        {
+            warningStrings.push_back("S21");
+            warningStrings.push_back("S12");
+        }
     }
-    if(cal.P23ThroughDone&&S.S.size()>2)
-	{
-        ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
-                            S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
-                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
-                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
-                            &(Sc.S[2][1]), &(Sc.S[1][2]));
+    if(S.S.size()>2)
+    {
+        if(cal.P13ThroughDone)
+        {
+            ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
+                                S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
+                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+                                &(Sc.S[2][0]), &(Sc.S[0][2]));
+        }
+        else
+        {
+            warningStrings.push_back("S31");
+            warningStrings.push_back("S13");
+        }
     }
-    if(cal.P24ThroughDone&&S.S.size()>3)
-	{
-        ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
-                            S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
-                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
-                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                            &(Sc.S[3][1]), &(Sc.S[1][3]));
+    if(S.S.size()>3)
+    {
+        if(cal.P14ThroughDone)
+        {
+            ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
+                                S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
+                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                                &(Sc.S[3][0]), &(Sc.S[0][3]));
+        }
+        else
+        {
+            warningStrings.push_back("S41");
+            warningStrings.push_back("S14");
+        }
     }
-    if(cal.P34ThroughDone&&S.S.size()>3)
-	{
-        ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
-                            S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
-                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
-                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                            &(Sc.S[3][2]), &(Sc.S[2][3]));
+    if(S.S.size()>2)
+    {
+        if(cal.P23ThroughDone)
+        {
+            ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
+                                S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
+                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+                                &(Sc.S[2][1]), &(Sc.S[1][2]));
+        }
+        else
+        {
+            warningStrings.push_back("S32");
+            warningStrings.push_back("S23");
+        }
     }
-	
+    if(S.S.size()>3)
+    {
+        if(cal.P24ThroughDone)
+        {
+            ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
+                                S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
+                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                                &(Sc.S[3][1]), &(Sc.S[1][3]));
+        }
+        else
+        {
+            warningStrings.push_back("S42");
+            warningStrings.push_back("S24");
+        }
+        if(cal.P34ThroughDone)
+        {
+            ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
+                                S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
+                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
+                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+                                &(Sc.S[3][2]), &(Sc.S[2][3]));
+        }
+        else
+        {
+            warningStrings.push_back("S43");
+            warningStrings.push_back("S34");
+        }
+    }
+    if(warningStrings.size()>0)
+    {
+        emit CalibrationWarning(warningStrings.join(',')+" not calibrated");
+    }
 	return Sc;
 }
 
@@ -503,6 +564,7 @@ bool CalSpar::TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, ca
     temp_cal.P23IsolationDone=cal.P23IsolationDone;
     temp_cal.P24IsolationDone=cal.P24IsolationDone;
     temp_cal.P34IsolationDone=cal.P34IsolationDone;
+    qDebug()<<cal.f.size();
 
 	Spline<double, complex_t> SpP1Short(cal.f, cal.P1Short);
 	Spline<double, complex_t> SpP1Open(cal.f, cal.P1Open);
@@ -606,7 +668,7 @@ bool CalSpar::TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, ca
         temp_cal.Isolation32.push_back(SpIsolation32[temp_cal.f[i]]);
         temp_cal.Isolation34.push_back(SpIsolation34[temp_cal.f[i]]);
         temp_cal.Isolation41.push_back(SpIsolation41[temp_cal.f[i]]);
-        temp_cal.Isolation42.push_back(SpIsolation43[temp_cal.f[i]]);
+        temp_cal.Isolation42.push_back(SpIsolation42[temp_cal.f[i]]);
         temp_cal.Isolation43.push_back(SpIsolation43[temp_cal.f[i]]);
         temp_cal.Reflect12.push_back(SpReflect12[temp_cal.f[i]]);
         temp_cal.Reflect13.push_back(SpReflect13[temp_cal.f[i]]);
@@ -618,7 +680,7 @@ bool CalSpar::TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, ca
         temp_cal.Reflect32.push_back(SpReflect32[temp_cal.f[i]]);
         temp_cal.Reflect34.push_back(SpReflect34[temp_cal.f[i]]);
         temp_cal.Reflect41.push_back(SpReflect41[temp_cal.f[i]]);
-        temp_cal.Reflect42.push_back(SpReflect43[temp_cal.f[i]]);
+        temp_cal.Reflect42.push_back(SpReflect42[temp_cal.f[i]]);
         temp_cal.Reflect43.push_back(SpReflect43[temp_cal.f[i]]);
 	}
 	*targetCal = temp_cal;
