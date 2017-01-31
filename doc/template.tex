@@ -1,0 +1,139 @@
+\pdfobjcompresslevel=0 
+\documentclass[12pt,a4paper,twoside]{article}
+%to use some special color names like "OliveGreen"
+\usepackage[usenames,dvipsnames]{color}
+%Math functions
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%Including images
+\usepackage{graphicx}
+%Source code listings
+\usepackage{listings}
+\usepackage{url}
+%Clickable links 
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=black, citecolor=black}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc} %codification of the document
+%to have your images correctly
+\usepackage{float}
+%used to fill with Lorem Ipsum text
+\usepackage{lipsum}
+%uses courier font in code listing
+\usepackage{courier}
+%A nicer way to create tables
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+%Headers on top and below page
+\usepackage{fancyhdr}
+%ability to use .svg images
+\usepackage{svg}
+%ablity to make a history index
+\usepackage{vhistory}
+%ability to make a  nomenclature abbreviation list
+\usepackage[intoc]{nomencl} %  for abbreviation list
+% just for generation blind text test.
+\usepackage{blindtext} 	
+% to change the page dimensions\textbf{}
+\usepackage{geometry}
+% to change a single page to landscape.
+\usepackage{lscape}
+% appendix
+\usepackage[toc,page]{appendix}
+% for merging pdf pages
+\usepackage{pdfpages} % merging pdf files.....
+% uncomment for a draft water mark in your document and edit it for your needs.
+%\usepackage[firstpage]{draftwatermark}
+%\SetWatermarkText{Set your on text}
+% set rotation angle for nice line up
+% please re calculated for a different aspect ratio
+%\SetWatermarkAngle{52.3058}
+%\SetWatermarkLightness{0.9}
+%\SetWatermarkScale{8}
+% for notes in the margin.
+\usepackage{marginnote}
+
+% For better looking item list.....
+\usepackage{mdwlist}
+%enable to make margins visible
+%\usepackage{showframe}
+
+
+% to have latex commands in your pdf output.
+\usepackage{listings}
+
+\usepackage{sectsty}
+% eps to pdf automatic
+\usepackage{epstopdf}
+%little trick so we can use \doctitle and \docauthor throughout the document
+\makeatletter
+\let\doctitle\@title
+\let\docauthor\@author
+\makeatother
+%use another font
+\renewcommand{\familydefault}{\sfdefault}
+%Put page numbers, document title and author in header / footer
+\fancypagestyle{plain}{
+	\fancyhead[L]{}
+	\fancyhead[R]{}
+	\fancyhead[CH]{\doctitle}
+	\fancyfoot[OR]{\thepage}
+	\fancyfoot[OL]{\DocVer}
+	\fancyfoot[EL]{\thepage}
+	\fancyfoot[ER]{\DocVer}
+	\fancyfoot[C]{\docauthor}
+	\renewcommand{\headrulewidth}{0.1 mm} % ad line under header
+	\renewcommand{\footrulewidth}{0.1 mm} % ad line under footer	
+}
+\setlength{\headheight}{51.4pt}
+%use plain page style with fancyheaders
+\pagestyle{plain}
+%put the nikhef logo and and some other things on the title page
+\fancypagestyle{titlepage}{
+	\fancyhead[C]{}
+	\fancyhead[L]{\includegraphics[width=0.075\textwidth]{figures/se.pdf} }
+	\fancyhead[R]{Schreuder \\Electronics}
+	\fancyfoot[L]{}
+	\fancyfoot[R]{}
+	\fancyfoot[C]{\href{http://www.schreuderelectronics.com}{http://www.schreuderelectronics.com}}
+	\renewcommand{\headrulewidth}{0.1 mm} % ad line under header
+	\renewcommand{\footrulewidth}{0 pt} % ad line under footer
+	
+}
+%lines below header and above footer
+%some better margins than default
+\geometry{a4paper}
+\geometry{left=27.5mm,right=27.5mm,bottom=27.5mm,top=27.5mm,marginparwidth=23mm} %margins\
+%make the header over the full page width for odd and even pages
+\fancyheadoffset[LE]{0 cm}
+%Format and colorize source code listings
+\lstset{
+	basicstyle=\footnotesize\ttfamily,
+	breaklines=true,
+	keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{OliveGreen},
+%    numbers=left,
+    morecomment=[l][\color{OliveGreen}]{\#}
+}
+
+%Add some properties to the PDF file 
+\hypersetup{pdfauthor={\docauthor},%
+            pdftitle={\doctitle},%
+            pdfsubject={\doctitle},%
+            pdfkeywords={Nikhef, ET, Electronics},%
+            pdfproducer={LaTeX},%
+            pdfcreator={LuaLaTeX}
+}
+% Loading circuitikz with siunitx option to create electronic circuits
+\usepackage[siunitx]{circuitikz}
+% command needed to make a nlo file for the nomenclature stuff.....
+\makenomenclature
+
+% some command to make a compact list
+\let\stditemize\itemize
+\let\endstditemize\enditemize
+\let\itemize\undefined
+%
+\makecompactlist{itemize}{stditemize}

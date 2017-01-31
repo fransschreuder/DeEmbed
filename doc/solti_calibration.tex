@@ -1,0 +1,96 @@
+\section{SOLTI Calibration}
+SOLTI Calibration is a commonly used calibration method in network analyzers. SOL stands for Short-Open-Load, the standards that are commonly used for a single port calibration. In order to calibrate the s-parameters between different ports, also Through-Isolation (TI) can be used to calibrate S21 and S12.
+
+
+
+
+\subsection{SOL Calibration}
+
+\begin{figure}[H]
+	\centering
+	\input{figures/OnePortModel.tex}
+	\caption{One port model}
+	\label{fig:oneportmodel}
+\end{figure}
+
+
+The measured S-parameter data can be de-embedded to the actual DUT with the lengths of the cables and the error coefficients of the network analyzer taken out of the data as if the DUT was measured directly.
+	\begin{equation}
+	\label{eqn:solcal}
+	S11=\frac{S11_{M}-e_{00}}{(S11_{M}e_{11})-\Delta_{e}}
+	\end{equation}
+	\begin{itemize}
+		\item $e_{00}$ is the Directivity
+		\item $e_{11}$ is the port match
+		\item $\Delta_{e} = e_{00}e_{11}-(e_{10}e_{01})$, of which $(e_{10}e_{01})$ is the tracking.
+		\item $S11$ is the one port S-parameter that you want to display (De-embedded)
+		\item 	$S11_M$ is the measured S-parameter including the cable and the errors of the port
+	\end{itemize}
+
+	The 3 error coefficients can be obtained from 3 independent measurements of known standards. The commonly used standards are Short, Open and Load, but any known standard can be used instead. (see section \ref{sec:obtainingerrorcoefsSOL})
+\subsubsection{Obtaining error coefficients for SOL calibration}
+\label{sec:obtainingerrorcoefsSOL}
+
+Equation \ref{eqn:solcal} contains 3 error coefficients $e_{00}$, $e_{11}$ and $\Delta_{e}$. From \cite{agilent_calibration} the equations \ref{eqn:obtaining1}, \ref{eqn:obtaining2} and \ref{eqn:obtaining3} are obtained. We see 3 times the same equations, but with different measurements. $\Gamma_1$, $\Gamma_2$ and $\Gamma_3$ are the known independent calibration standards, in this case Short, Open and Load. The standards don't have to be perfect though, a short can for instance have some series inductance or loss (see \ref{sec:calstds}). $\Gamma_{M1}$, $\Gamma_{M2}$ and $\Gamma_{M3}$ are the measured traces, this data is obtained by connecting the well-defined calibration standard to the network analyzer, through the cable that is also used in the measurement and measure the reflection (S11). Equations \ref{eqn:obtaining1}, \ref{eqn:obtaining2} and \ref{eqn:obtaining3} still contain our 3 unknown error coefficients $e_{00}$, $e_{11}$ and $\Delta_{e}$ that we need to solve equation \ref{eqn:solcal}.
+
+	
+	\small
+	\begin{equation}
+	\label{eqn:obtaining1}
+	\Gamma_{M{1}} = e_{00}+\Gamma_{1}\Gamma_{M{1}}e{11}-\Gamma_{1}\Delta_{e}
+	\end{equation}
+
+	\begin{equation}
+	\label{eqn:obtaining2}
+	\Gamma_{M{2}} = e_{00}+\Gamma_{2}\Gamma_{M{2}}e{11}-\Gamma_{2}\Delta_{e}
+	\end{equation}
+
+	\begin{equation}
+	\label{eqn:obtaining3}
+	\Gamma_{M{3}} = e_{00}+\Gamma_{3}\Gamma_{M{3}}e{11}-\Gamma_{3}\Delta_{e}
+	\end{equation}
+	\normalsize
+
+In order to solve $e_{00}$, $e_{11}$ and $\Delta_{e}$ we need to substitute equations  \ref{eqn:obtaining1}, \ref{eqn:obtaining2} and \ref{eqn:obtaining3} into one equation and extract the 3 error coefficients. The result is 3 lengthy equations, but with modern computers they can easily be computed for all the data points in our measurement.
+
+	\small
+	\begin{equation}
+		e_{00} = -\frac{{\left(\Gamma_{2} \Gamma_{M_{3}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1} \Gamma_{M_{2}} - {\left(\Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{M_{3}}\right)} \Gamma_{1}\right)} \Gamma_{M_{1}}}{\Gamma_{1} {\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} + \Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{2} \Gamma_{M_{2}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1}}		
+	\end{equation}
+	\begin{equation}
+	e_{11} = \frac{{\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} - \Gamma_{1} {\left(\Gamma_{M_{2}} - \Gamma_{M_{3}}\right)} + \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{M_{3}}}{\Gamma_{1} {\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} + \Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{2} \Gamma_{M_{2}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1}}
+	\end{equation}
+	\begin{equation}
+	 \Delta_{e} = -\frac{{\left(\Gamma_{1} {\left(\Gamma_{M_{2}} - \Gamma_{M_{3}}\right)} - \Gamma_{2} \Gamma_{M_{2}} + \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{M_{1}} + {\left(\Gamma_{2} \Gamma_{M_{3}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{M_{2}}}{\Gamma_{1} {\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} + \Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{2} \Gamma_{M_{2}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1}}
+	\end{equation}
+	\normalsize
+	
+\subsection{TI Calibration}
+
+\begin{figure}[H]
+	\centering
+	\input{figures/TwoPortModel.tex}
+	\caption{One port model}
+	\label{fig:twoportmodel}
+\end{figure}
+The Through - Isolation calibration depends on the SOL calibration, this calibration has to be done first. The two port isolation measurement file is created with the measurement cables connected to a 50$\Omega$ load. From this file the following error terms are obtained:
+\begin{itemize}
+	\item $e_{30}$ is obtained from $S_{21}$, this is the forward isolation
+	\item $e_{03}$ is obtained from $S_{12}$, this is the reverse isolation
+\end{itemize}
+\small
+\begin{equation}
+S_{21}=\frac{\left( \frac{S_{21M}-e_{30}}{e_{10}e_{32}}\right)\left[1+\left(\frac{S_{22M}-e'_{33}}{e'_{23}e'_{32}}\right)\left(e'_{22}-e_{22}\right)\right]}{D}
+\end{equation}
+
+\begin{equation}
+S_{12}=\frac{\left( \frac{S_{12M}-e'_{03}}{e'_{23}e'_{01}}\right)\left[1+\left(\frac{S_{11M}-e_{00}}{e_{10}e_{01}}\right)\left(e_{11}-e'_{11}\right)\right]}{D}
+\end{equation}
+
+\begin{equation}
+D=\left[1+\left(\frac{S_{11M}-e_{00}}{e_{10}e_{01}}\right)e_{11}\right]\left[1+\left(\frac{S_{22M}-e'_{33}}{e'_{23}e'_{32}}\right)e'_{22}\right]- \\ \left(\frac{S_{21M}-e_{30}}{e_{10}e_{32}}\right) \left(\frac{S_{12M}-e'_{03}}{e'_{23}e'_{01}}\right)e_{22}e'_{11}
+\end{equation}
+\normalsize
+\subsection{Calibration Standards}
+\label{sec:calstds}
+
