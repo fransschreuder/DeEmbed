@@ -52,7 +52,7 @@ public:
                                           vector<complex_t> rawS11, vector<complex_t> shortS11, vector<complex_t> openS11, vector<complex_t> loadS11,
                                           vector<complex_t> rawS22, vector<complex_t> shortS22, vector<complex_t> openS22, vector<complex_t> loadS22,
                                           vector<double> f,
-                                          vector<complex_t>* calS21, vector<complex_t>* calS12);
+                                          vector<complex_t>* calS21, vector<complex_t>* calS12, vector<complex_t>* calS11, vector<complex_t>* calS22);
     ///! Cal executes both SOLCal and ThroughIsolationCal on a dataset
 	spar_t Cal(spar_t& S, cal_t& cal);
     ///! This overloaded Cal executes SOLCal and ThroughIsolationCal on a single trace with 2 indexes in the matrix.

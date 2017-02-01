@@ -1,10 +1,11 @@
-\section{SOLTI Calibration}
+\section{Calibration}
 SOLTI Calibration is a commonly used calibration method in network analyzers. SOL stands for Short-Open-Load, the standards that are commonly used for a single port calibration. In order to calibrate the s-parameters between different ports, also Through-Isolation (TI) can be used to calibrate S21 and S12.
 
 
 
 
 \subsection{SOL Calibration}
+\label{sec:solcal}
 
 \begin{figure}[H]
 	\centering
@@ -28,6 +29,7 @@ The measured S-parameter data can be de-embedded to the actual DUT with the leng
 	\end{itemize}
 
 	The 3 error coefficients can be obtained from 3 independent measurements of known standards. The commonly used standards are Short, Open and Load, but any known standard can be used instead. (see section \ref{sec:obtainingerrorcoefsSOL})
+\newpage
 \subsubsection{Obtaining error coefficients for SOL calibration}
 \label{sec:obtainingerrorcoefsSOL}
 
@@ -55,42 +57,187 @@ In order to solve $e_{00}$, $e_{11}$ and $\Delta_{e}$ we need to substitute equa
 
 	\small
 	\begin{equation}
+	\label{eqn:e00}
 		e_{00} = -\frac{{\left(\Gamma_{2} \Gamma_{M_{3}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1} \Gamma_{M_{2}} - {\left(\Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{M_{3}}\right)} \Gamma_{1}\right)} \Gamma_{M_{1}}}{\Gamma_{1} {\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} + \Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{2} \Gamma_{M_{2}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1}}		
 	\end{equation}
 	\begin{equation}
+	\label{eqn:e11}
 	e_{11} = \frac{{\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} - \Gamma_{1} {\left(\Gamma_{M_{2}} - \Gamma_{M_{3}}\right)} + \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{M_{3}}}{\Gamma_{1} {\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} + \Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{2} \Gamma_{M_{2}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1}}
 	\end{equation}
 	\begin{equation}
+	\label{eqn:deltae}
 	 \Delta_{e} = -\frac{{\left(\Gamma_{1} {\left(\Gamma_{M_{2}} - \Gamma_{M_{3}}\right)} - \Gamma_{2} \Gamma_{M_{2}} + \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{M_{1}} + {\left(\Gamma_{2} \Gamma_{M_{3}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{M_{2}}}{\Gamma_{1} {\left(\Gamma_{2} - \Gamma_{3}\right)} \Gamma_{M_{1}} + \Gamma_{2} \Gamma_{3} \Gamma_{M_{2}} - \Gamma_{2} \Gamma_{3} \Gamma_{M_{3}} - {\left(\Gamma_{2} \Gamma_{M_{2}} - \Gamma_{3} \Gamma_{M_{3}}\right)} \Gamma_{1}}
 	\end{equation}
 	\normalsize
 	
-\subsection{TI Calibration}
-
+\newpage
+\subsection{Full two port calibration}
+\label{sec:soltical}
 \begin{figure}[H]
 	\centering
 	\input{figures/TwoPortModel.tex}
-	\caption{One port model}
+	\caption{Two port model}
 	\label{fig:twoportmodel}
 \end{figure}
-The Through - Isolation calibration depends on the SOL calibration, this calibration has to be done first. The two port isolation measurement file is created with the measurement cables connected to a 50$\Omega$ load. From this file the following error terms are obtained:
+
+Where the SOL calibration is using 3 error coefficients, the full two port calibration needs 12 for SOLTI calibration (Short - Open - Load - Through - Isolation). In order to obtain the 12 error terms, we need Short Open Load measurements for every port as performed in section \ref{sec:solcal}. Apart from the SOL measurements we also need a Through measurement (two cables connected) and an isolation measurement. An additional standard is also introduced, a non-perfect through standard (see section \ref{sec:calstds}). The 12 error coefficients needed for SOLTI calibration are obtained in section \ref{sec:obtainingsolti}.
+
+\begin{equation}
+D = \left[1+\frac{S_{11M}-e_{00}}{e_{10}e_{01}}e_{11}\right]
+\left[1+\frac{S_{22M}-e_{33}}{e_{23}e_{32}}e_{22}\right]-
+\frac{S_{21M}-e_{30}}{e_{10}e_{32}}
+\frac{S_{12M}-e_{03}}{e_{23}e_{01}}
+e'_{22}e'_{11}
+\end{equation}
+\begin{equation}
+S_{11}= \frac{\frac{S_{11M}-e_{00}}{e_{10}e_{01}}\left[ 1+\frac{S_{22M}-e_{33}}{e_{23}e_{32}}e_{22}\right]-e'_{22}\frac{S_{21M}-e_{30}}{e_{10}e_{32}}\frac{S_{12M}-e_{03}}{e_{23}e_{01}}}{D}
+\end{equation}
+\begin{equation}
+S_{21} = \frac{\frac{S_{21M}-e_{30}}{e_{10}e_{32}}\left[1+\frac{S_{22M}-e_{33}}{e_{23}e_{32}}(e_{22}-e'_{22})\right]}{D}
+\end{equation}
+\begin{equation}
+S_{12} = \frac{\frac{S_{12M}-e_{03}}{e_{23}e_{01}}\left[1+\frac{S_{11M}-e_{00}}{e_{10}e_{01}}(e_{11}-e'_{11})\right]}{D}
+\end{equation}
+\begin{equation}
+S_{22}= \frac{\frac{S_{22M}-e_{33}}{e_{23}e_{32}}\left[ 1+\frac{S_{11M}-e_{00}}{e_{10}e_{01}}e_{11}\right]-e'_{11}\frac{S_{12M}-e_{03}}{e_{23}e_{01}}\frac{S_{21M}-e_{30}}{e_{10}e_{32}}}{D}
+\end{equation}
+\newpage
 \begin{itemize}
-	\item $e_{30}$ is obtained from $S_{21}$, this is the forward isolation
-	\item $e_{03}$ is obtained from $S_{12}$, this is the reverse isolation
+	\item $e_{00}$: Port 1 directivity
+	\item $e_{11}$: Port 1 match
+	\item $e_{10}e_{01}$: Port 1 reflection tracking
+	\item $e_{10}e_{32}$: Forward transmission tracking
+	\item $e'_{22}$: Port 2 match seen from port 1
+	\item $e_{30}$: Forward transmission leakage
+	\item $e_{33}$: Port 2 directivity
+	\item $e_{22}$: Port 2 match
+	\item $e_{23}e_{32}$: Port 2 reflection tracking
+	\item $e_{23}e_{01}$: Reverse transmission tracking
+	\item $e'_{11}$: Port 1 match seen from port 2
+	\item $e_{03}$: Reverse transmission leakage
 \end{itemize}
-\small
+
+
+
+\subsubsection{obtaining the error coefficients for SOLTI Calibration}
+\label{sec:obtainingsolti}
+The Through - Isolation calibration depends on the SOL calibration, this calibration has to be done first. 
+$e_{00}$, $e_{11}$ and $\Delta_{eP1}$ are obtained from the measurements in \ref{sec:obtainingerrorcoefsSOL}, $e_{33}$, $e_{22}$ and $\Delta_{eP2}$ use the same equations but with Short / Open / Load measurements taken from port 2.
+\begin{itemize}
+	\item {$e_{00}$ and $e_{33}$ are obtained from equation \ref{eqn:e00}}
+	\item {$e_{11}$ and $e_{22}$ are obtained from equation \ref{eqn:e11}}	
+	\item {$\Delta_{eP1}$ and $\Delta_{eP2}$ are obtained from equation \ref{eqn:deltae}}
+\end{itemize}
+
 \begin{equation}
-S_{21}=\frac{\left( \frac{S_{21M}-e_{30}}{e_{10}e_{32}}\right)\left[1+\left(\frac{S_{22M}-e'_{33}}{e'_{23}e'_{32}}\right)\left(e'_{22}-e_{22}\right)\right]}{D}
+(e_{10}e_{01}) = \frac{\Delta_{eP1}}{e_{11}e_{00}}
+\end{equation}
+\begin{equation}
+(e_{23}e_{32}) = \frac{\Delta_{eP2}}{e_{22}e_{33}}
+\end{equation}
+
+For the next set of equations, we determine 5 sets of 2-port s-parameter matrices.
+\begin{itemize}
+	\item {$S_i$: The isolation measurement executed with the two measurement cables connected to $50\Omega$ loads. From this matrix only $S_{21i}$ and $S_{12i}$ are used.}
+	\item {$S_t$: The through measurement, this s-parameter contains data of the measured through standard with the uncalibrated network analyzer.}
+	\item {$S_s$: The through standard (see paragraph \ref{sec:calstds})}
+	\item {$S_M$: The measured S-parameter matrix of the 2-port DUT}
+	\item {$S$: This is the resulting calibrated S-parameter matrix containing $S_{11}$, $S_{21}$, $S_{12}$ and $S_{22}$}
+	
+\end{itemize}
+The two port isolation measurement file is created with the measurement cables connected to a 50$\Omega$ load. From this file the following error terms are obtained:
+\begin{itemize}
+	\item $e_{30} = S_{21i}$, this is the forward isolation
+	\item $e_{03} = S_{12i}$, this is the reverse isolation
+\end{itemize}
+
+
+
+$e'_{22}$ is in fact the same error term as $e_{22}$, but it is seen from port 1, for that reason we use a different calculation. Instead we use the SOL calibration method to de-embed the reflection measured at the through measurement $S_{11t}$, normalized to the standard $S_{21s}$. The same is true for $e'_{11}$. 
+
+\begin{equation}
+e'_{22} = \frac{\frac{S_{11t}}{S_{21s}}-e_{00}}{\frac{S_{11t}}{S_{21s}}e_{11}-\Delta_{eP1}}
+\end{equation}
+\begin{equation}
+e'_{11} = \frac{\frac{S_{22t}}{S_{12s}}-e_{33}}{\frac{S_{22t}}{S_{12s}}e_{22}-\Delta_{eP2}}
 \end{equation}
 
 \begin{equation}
-S_{12}=\frac{\left( \frac{S_{12M}-e'_{03}}{e'_{23}e'_{01}}\right)\left[1+\left(\frac{S_{11M}-e_{00}}{e_{10}e_{01}}\right)\left(e_{11}-e'_{11}\right)\right]}{D}
+e_{10}e_{32} = \left(\frac{S_{21t}}{S_{21s}} - e_{30}\right)\left(1-e_{11}e'_{22}\right);
+\end{equation}
+\begin{equation}
+e_{23}e_{01} = \left(\frac{S_{12t}}{S_{12s}} - e_{03}\right)\left(1-e_{22}e'_{11}\right);
 \end{equation}
 
-\begin{equation}
-D=\left[1+\left(\frac{S_{11M}-e_{00}}{e_{10}e_{01}}\right)e_{11}\right]\left[1+\left(\frac{S_{22M}-e'_{33}}{e'_{23}e'_{32}}\right)e'_{22}\right]- \\ \left(\frac{S_{21M}-e_{30}}{e_{10}e_{32}}\right) \left(\frac{S_{12M}-e'_{03}}{e'_{23}e'_{01}}\right)e_{22}e'_{11}
-\end{equation}
-\normalsize
+
 \subsection{Calibration Standards}
 \label{sec:calstds}
+
+The calibrations used in \ref{sec:solcal} and \ref{sec:soltical} contain measurements of known standards, but apart from the measured trace we also need to know what the actual standard looks like. In order to use the standard in the calibration methods, we need to know the $\Gamma$ (S-Parameter) of the standard.
+\subsubsection{Short}
+The short standard like other standards is never $0\Omega$, instead it usually has a series inductance that can be frequency dependent. The connector of the standard can also have electrical loss and an electrical length. The parameters of the Short standard in DeEmbed are:
+\begin{itemize}
+	\item $L_0$: Constant series inductance.
+	\item $L_1 \cdot f$: Series inductance with linear frequency dependency
+	\item $L_2 \cdot f^2$: Series inductance with quadratic frequency dependency
+	\item $L_3 \cdot f^3$: Series inductance with cubic frequency dependency
+	\item Loss(dB): Connector or trace loss of the standard
+	\item Loss(dB/Hz): Frequency dependent connector or trace loss of the standard
+	\item Length (m): Electrical (not physical) length of the connector / trace towards the standard.
+\end{itemize}
+$\Gamma_{sp}$ is calculated in 3 steps, first the complex impedance of the inductive part is calculated:
+\begin{equation}
+Z_{sp} = i 2 \pi f (L_0 + L_1 f + L_2 f^2 + L_3 f^3)
+\end{equation}
+Convert $Z_{sp}$ into $\Gamma_{sp}$ with equation \ref{eqn:stoz}.
+\begin{equation}
+\label{eqn:stoz}
+\Gamma=\frac{\frac{Z}{50\Omega}-1}{\frac{Z}{50\Omega}+1}
+\end{equation}
+At last we apply electrical length and loss:
+\begin{equation}
+\Gamma_{sp} = \Gamma_{sp} e^{2 \pi length\cdot f\cdot c^{-1}} 10^{\frac{-Loss_{dB}}{20}} 10^{\frac{-Loss_{dBHz} f }{20}}
+\end{equation}
+where $c$ is the speed of light (299792458)
+
+
+\subsubsection{Open}
+The open standard like other standards is never $\infty\Omega$, instead it usually has a capacitance that can be frequency dependent. The connector of the standard can also have electrical loss and an electrical length. The parameters of the Open standard in DeEmbed are:
+\begin{itemize}
+	\item $C_0$: Constant series capacitance.
+	\item $C_1 \cdot f$: Series capacitance with linear frequency dependency
+	\item $C_2 \cdot f^2$: Series capacitance with quadratic frequency dependency
+	\item $C_3 \cdot f^3$: Series capacitance with cubic frequency dependency
+	\item Loss(dB): Connector or trace loss of the standard
+	\item Loss(dB/Hz): Frequency dependent connector or trace loss of the standard
+	\item Length (m): Electrical (not physical) length of the connector / trace towards the standard.
+\end{itemize}
+$\Gamma_{op}$ is calculated in 3 steps, first the complex impedance of the capacitive part is calculated:
+\begin{equation}
+Z_{op} = \frac{-i}{2 \pi f (C_0 + C_1 f + C_2 f^2 + C_3 f^3)}
+\end{equation}
+Convert $Z_{op}$ into $\Gamma_{op}$ with equation \ref{eqn:stoz}. 
+At last we apply electrical length and loss:
+\begin{equation}
+\Gamma_{op} = \Gamma_{op} e^{2 \pi length\cdot f\cdot c^{-1}} 10^{\frac{-Loss_{dB}}{20}} 10^{\frac{-Loss_{dBHz} f }{20}}
+\end{equation}
+where $c$ is the speed of light (299792458)
+\subsubsection{Load}
+The load standard in DeEmbed can be defined as a perfect resistance ($R_l$) with a series inductance ($L_l$).
+\begin{equation}
+Z_{lp} = R_l + 2 \pi f \cdot L_l
+\end{equation}
+Convert $Z_{lp}$ into $\Gamma_{lp}$ with equation \ref{eqn:stoz}.
+\subsubsection{Through}
+The through standard is only a connector between the two cables, we define the standard with only length and loss:
+\begin{itemize}
+	\item Loss(dB): Connector or trace loss of the standard
+	\item Loss(dB/Hz): Frequency dependent connector or trace loss of the standard
+	\item Length (m): Electrical (not physical) length of the connector / trace towards the standard.
+\end{itemize}
+\begin{equation}
+\Gamma_{th} = 1 \cdot e^{2 \pi length\cdot f\cdot c^{-1}} 10^{\frac{-Loss_{dB}}{20}} 10^{\frac{-Loss_{dBHz} f }{20}}
+\end{equation}
+
+\newpage
 

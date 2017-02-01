@@ -1,0 +1,6 @@
+*.o
+moc_*.cpp
+ui_*.h
+Makefile
+deembed
+qrc_*.cpp
