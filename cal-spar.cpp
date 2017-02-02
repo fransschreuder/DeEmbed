@@ -183,13 +183,25 @@ void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> th
                       ((rawS12[i]-e03)/e23e01)*
                        E22*E11;
         //(*calS21)[i] = (rawS21[i]-e30)/(throughS21[i]/Gth);
+        complex_t _calS21, _calS12, __calS21, __calS12, _calS11, _calS22;
 
-        (*calS21)[i] = (((rawS21[i]-e30)/(e10e32))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32))*(e22-E22)))/D;
-        (*calS12)[i] = (((rawS12[i]-e03)/(e23e01))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01))*(e11-E11)))/D;
-        (*calS11)[i] = (rawS11[i]-e00)/((rawS11[i]*e11)-de_P1)-((*calS12)[i]*(*calS21)[i]*E22);
-        (*calS22)[i] = (rawS22[i]-e33)/((rawS22[i]*e22)-de_P2)-((*calS12)[i]*(*calS21)[i]*E11);
-        (*calS21)[i] -= (*calS21)[i]*(*calS22)[i]*(E22) + (*calS12)[i]*(*calS11)[i]*(E11);
-        (*calS12)[i] -= (*calS12)[i]*(*calS11)[i]*(E11) + (*calS21)[i]*(*calS22)[i]*(E22);
+        __calS21 = (((rawS21[i]-e30)/(e10e32))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32))*(e22-E22)))/D;
+        __calS12 = (((rawS12[i]-e03)/(e23e01))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01))*(e11-E11)))/D;
+        _calS21=__calS21;
+        _calS12=__calS12;
+        for(int j=0; j<2; j++)
+        {
+            _calS11 = (rawS11[i]-e00)/((rawS11[i]*e11)-de_P1)-(_calS12*_calS21*E22);
+            _calS22 = (rawS22[i]-e33)/((rawS22[i]*e22)-de_P2)-(_calS12*_calS21*E11);
+            _calS21 = __calS21 - (__calS21*_calS22*(E22) + __calS21*_calS11*(E11));
+            _calS12 = __calS12 - (__calS12*_calS11*(E11) + __calS12*_calS22*(E22));
+        }
+
+        (*calS21)[i]=_calS21;
+        (*calS12)[i]=_calS12;
+        (*calS11)[i]=_calS11;
+        (*calS22)[i]=_calS22;
+
 
         //(*calS11)[i] = (((rawS11[i]-e00)/(e10e01))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32)*e22))-(E22 * ((rawS21[i]-e30)/(e10e32))*((rawS12[i]-e03)/(e23e01))))/ D;
         //(*calS22)[i] = (((rawS22[i]-e33)/(e23e32))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01)*e11))-(E11 * ((rawS12[i]-e03)/(e23e01))*((rawS21[i]-e30)/(e10e32))))/ D;
