@@ -204,7 +204,11 @@ void MainWindow::loadFile(const QString& path)
 
         }
         ui->chart->PutSpar(spar,-1, filename);
-        m_calibrator.TrimCal(m_cal, spar.f[0],spar.f.back(), spar.f.size(), &m_cal);
+        if(m_cal.f[0]!=spar.f[0]||m_cal.f.back()!=spar.f.back()||m_cal.f.size()!=spar.f.size())
+        {
+            m_calibrator.TrimCal(m_cal, spar.f[0],spar.f.back(), spar.f.size(), &m_cal);
+            ui->statusBar->showMessage("Warning: Calibration data interpolated", 60000);
+        }
         spar_t calSpar = m_calibrator.Cal(spar, m_cal);
         ui->chart->PutSpar(calSpar, -1, filename+"(cal)");
         adjustForCurrentFile(path);
