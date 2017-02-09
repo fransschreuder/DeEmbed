@@ -27,10 +27,26 @@ If you want to de-embed a two port S-Parameter file, only Short, Open and Load f
 
 If the file supplied with the browse button (...) can be found, the filename colors green, otherwise the box turns red. The green color does not indicate that the file is a valid Touchstone file.
 
+The application DeEmbed comes with some example calibration files, and two DUT files:
+
+The files are located in <installation prefix>/share/examples/ 
+\begin{itemize}
+\item \textbf{short\_750mm.s1p}: Ideal short simulated with 750mm coaxial cable (qucs)
+\item \textbf{open\_750mm.s1p}: Ideal open simulated with 750mm coaxial cable (qucs)
+\item \textbf{load\_750mm.s1p}: Ideal $50\Omega$ load simulated with 750mm coaxial cable (qucs)
+\item \textbf{through\_750mm.s2p}: Ideal through simulated with 2 times 750mm coaxial cable (qucs)
+\item \textbf{isolation\_750mm.s2p}: 2 times 750mm coaxial cable simulated with an open end (qucs)
+\item \textbf{dut\_750mm.s2p}: Low pass filter simulated with 2x 750mm coaxial cable (qucs)
+\item \textbf{dut\_ideal.s2p}: The same low pass filter simulated without cable
+
+\end{itemize}
+
+If you load the right calibration files (2x short open load and 1x through + isolation) the non-calibrated trace of dut\_ideal will exactly follow the calibrated trace of dut\_750mm. The calibration standards should be chosen as ideal.
+\newpage
 \subsection{Setting calibration standards}
 \label{sec:settingcalstds}
 
-The measured calibration standards described in \ref{sec:loadingcalfiles} are usually not measured with perfect calibration standards, unless a simulator is used to generate the calibration files. In case of a perfect calibration kit, the calibration set ''Ideal''can be used.
+The measured calibration standards described in \ref{sec:loadingcalfiles} are usually not measured with perfect calibration standards, unless a simulator is used to generate the calibration files. In case of a perfect calibration kit, the calibration set ''Ideal''can be used. The equations and the different components in the calibration standards are explained in \ref{sec:calstds}.
 
 \begin{figure}[H]
 	\centering
@@ -38,6 +54,28 @@ The measured calibration standards described in \ref{sec:loadingcalfiles} are us
 	\caption{Calibration standards dialog}
 	\label{fig:calstddialog}
 \end{figure}
+
+An actual calibration kit should come with the different parameters, or the measured calibration kit can be fitted using a simulator to obtain the right standard constants.
+
+A realistic calibration kit (Default) comes with the application, note that this kit does not refer to any commercially available calibration kit.
+
+If you change the calibration standard in this dialog while Touchstone files and calibration files are loaded, the graph will update instantly while changing the constants. This way it is also easy to fit two traces together.
 \subsection{Open and save Touchstone files}
+From the GUI, Touchstone files can be loaded and saved. DeEmbed handles 1, 2, 3 and 4 port Touchstone files \cite{touchstoneformat}, both to open and save.
 \subsection{Navigate the chart}
+The chart can be navigated using the mouse wheel and combinations of Shift and Control:
+\begin{itemize}
+\item    Scrolling zooms the smith chart and centers
+\item    Scrolling moves a cartesian chart
+\item    Ctrl+scrolling zooms a cartesian chart
+\item    Shift+scrolling moves the right cartesian axis
+\item    Shift+Ctrl+scrolling zooms the right cartesian axis
+\item    A marker can be set by right clicking near to one of the traces.
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/screenshot2.png}
+	\caption{The main window showing the graph in dB mode}
+	\label{fig:dbchart}
+\end{figure}
 \newpage
