@@ -165,8 +165,8 @@ void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> th
 
         //complex_t S11 = (rawS11[i]-e00)/((rawS11[i]*e11)-de);
 
-        complex_t e10e01 = de_P1/(e11*e00);
-        complex_t e23e32 = de_P2/(e22*e33);
+        complex_t e10e01 = -de_P1+(e11*e00);
+        complex_t e23e32 = -de_P2+(e22*e33);
 
         complex_t e30 = isolationS21[i];
         complex_t e03 = isolationS12[i];
@@ -182,29 +182,13 @@ void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> th
                       ((rawS21[i]-e30)/e10e32)*
                       ((rawS12[i]-e03)/e23e01)*
                        E22*E11;
-        //(*calS21)[i] = (rawS21[i]-e30)/(throughS21[i]/Gth);
-        complex_t _calS21, _calS12, __calS21, __calS12, _calS11, _calS22;
 
-        __calS21 = (((rawS21[i]-e30)/(e10e32))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32))*(e22-E22)))/D;
-        __calS12 = (((rawS12[i]-e03)/(e23e01))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01))*(e11-E11)))/D;
-        _calS21=__calS21;
-        _calS12=__calS12;
-        for(int j=0; j<2; j++)
-        {
-            _calS11 = (rawS11[i]-e00)/((rawS11[i]*e11)-de_P1)-(_calS12*_calS21*E22);
-            _calS22 = (rawS22[i]-e33)/((rawS22[i]*e22)-de_P2)-(_calS12*_calS21*E11);
-            _calS21 = __calS21 - (__calS21*_calS22*(E22) + __calS21*_calS11*(E11));
-            _calS12 = __calS12 - (__calS12*_calS11*(E11) + __calS12*_calS22*(E22));
-        }
-
-        (*calS21)[i]=_calS21;
-        (*calS12)[i]=_calS12;
-        (*calS11)[i]=_calS11;
-        (*calS22)[i]=_calS22;
+        (*calS21)[i] = (((rawS21[i]-e30)/(e10e32))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32))*(e22-E22)))/D;
+        (*calS12)[i] = (((rawS12[i]-e03)/(e23e01))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01))*(e11-E11)))/D;
 
 
-        //(*calS11)[i] = (((rawS11[i]-e00)/(e10e01))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32)*e22))-(E22 * ((rawS21[i]-e30)/(e10e32))*((rawS12[i]-e03)/(e23e01))))/ D;
-        //(*calS22)[i] = (((rawS22[i]-e33)/(e23e32))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01)*e11))-(E11 * ((rawS12[i]-e03)/(e23e01))*((rawS21[i]-e30)/(e10e32))))/ D;
+        (*calS11)[i] = (((rawS11[i]-e00)/(e10e01))*(complex_t(1,0)+((rawS22[i]-e33)/(e23e32)*e22))-(E22 * ((rawS21[i]-e30)/(e10e32))*((rawS12[i]-e03)/(e23e01))))/ D;
+        (*calS22)[i] = (((rawS22[i]-e33)/(e23e32))*(complex_t(1,0)+((rawS11[i]-e00)/(e10e01)*e11))-(E11 * ((rawS12[i]-e03)/(e23e01))*((rawS21[i]-e30)/(e10e32))))/ D;
 		
 	}
 
@@ -728,6 +712,32 @@ tCalStd CalSpar::DefaultCalStd(void)
     c.LossdBThrough=0.1;
     c.LossdBHzThrough=1e-12;
 	return c;
+}
+
+tCalStd CalSpar::IdealCalStd(void)
+{
+    tCalStd c;
+    c.Name="Ideal";
+    c.L0=0;
+    c.L1=0;
+    c.L2=0;
+    c.L3=0;
+    c.LengthShort=0;
+    c.LossdBShort=0;
+    c.LossdBHzShort=0;
+    c.C0=0;
+    c.C1=0;
+    c.C2=0;
+    c.C3=0;
+    c.LengthOpen=0;
+    c.LossdBOpen=0;
+    c.LossdBHzOpen=0;
+    c.Ll=0;
+    c.Rl=50;
+    c.LengthThrough=0;
+    c.LossdBThrough=0;
+    c.LossdBHzThrough=0;
+    return c;
 }
 
 #endif

@@ -130,10 +130,10 @@ $e_{00}$, $e_{11}$ and $\Delta_{eP1}$ are obtained from the measurements in \ref
 \end{itemize}
 
 \begin{equation}
-(e_{10}e_{01}) = \frac{\Delta_{eP1}}{e_{11}e_{00}}
+(e_{10}e_{01}) = -\Delta_{eP1}+e_{11}e_{00}
 \end{equation}
 \begin{equation}
-(e_{23}e_{32}) = \frac{\Delta_{eP2}}{e_{22}e_{33}}
+(e_{23}e_{32}) = -\Delta_{eP2}+e_{22}e_{33}
 \end{equation}
 
 For the next set of equations, we determine 5 sets of 2-port s-parameter matrices.
@@ -156,18 +156,24 @@ The two port isolation measurement file is created with the measurement cables c
 $e'_{22}$ is in fact the same error term as $e_{22}$, but it is seen from port 1, for that reason we use a different calculation. Instead we use the SOL calibration method to de-embed the reflection measured at the through measurement $S_{11t}$, normalized to the standard $S_{21s}$. The same is true for $e'_{11}$. 
 
 \begin{equation}
+\label{eqn:e'22}
 e'_{22} = \frac{\frac{S_{11t}}{S_{21s}}-e_{00}}{\frac{S_{11t}}{S_{21s}}e_{11}-\Delta_{eP1}}
 \end{equation}
 \begin{equation}
+\label{eqn:e'11}
 e'_{11} = \frac{\frac{S_{22t}}{S_{12s}}-e_{33}}{\frac{S_{22t}}{S_{12s}}e_{22}-\Delta_{eP2}}
 \end{equation}
 
 \begin{equation}
-e_{10}e_{32} = \left(\frac{S_{21t}}{S_{21s}} - e_{30}\right)\left(1-e_{11}e'_{22}\right);
+\label{eqn:e10e32}
+e_{10}e_{32} = \left(\frac{S_{21t}}{S_{21s}} - e_{30}\right)\left(1-e_{11}e'_{22}\right)
 \end{equation}
 \begin{equation}
-e_{23}e_{01} = \left(\frac{S_{12t}}{S_{12s}} - e_{03}\right)\left(1-e_{22}e'_{11}\right);
+\label{eqn:e23e01}
+e_{23}e_{01} = \left(\frac{S_{12t}}{S_{12s}} - e_{03}\right)\left(1-e_{22}e'_{11}\right)
 \end{equation}
+
+The 12-term calibration method from Agilent \cite{agilent_calibration} does not mention any through standard in its equations, Equations \ref{eqn:e'11} to \ref{eqn:e23e01} are slightly modified with respect to \cite{agilent_calibration}, the Through and Reflect measurements $S_{11t}$, $S_{21t}$, $S_{12t}$ and $S_{22t}$ are compensated with (divided by) the known through standard \ref{sec:throughstd}
 
 
 \subsection{Calibration Standards}
@@ -175,6 +181,7 @@ e_{23}e_{01} = \left(\frac{S_{12t}}{S_{12s}} - e_{03}\right)\left(1-e_{22}e'_{11
 
 The calibrations used in \ref{sec:solcal} and \ref{sec:soltical} contain measurements of known standards, but apart from the measured trace we also need to know what the actual standard looks like. In order to use the standard in the calibration methods, we need to know the $\Gamma$ (S-Parameter) of the standard.
 \subsubsection{Short}
+\label{sec:shortstd}
 The short standard like other standards is never $0\Omega$, instead it usually has a series inductance that can be frequency dependent. The connector of the standard can also have electrical loss and an electrical length. The parameters of the Short standard in DeEmbed are:
 \begin{itemize}
 	\item $L_0$: Constant series inductance.
@@ -202,6 +209,7 @@ where $c$ is the speed of light (299792458)
 
 
 \subsubsection{Open}
+\label{sec:openstd}
 The open standard like other standards is never $\infty\Omega$, instead it usually has a capacitance that can be frequency dependent. The connector of the standard can also have electrical loss and an electrical length. The parameters of the Open standard in DeEmbed are:
 \begin{itemize}
 	\item $C_0$: Constant series capacitance.
@@ -223,12 +231,14 @@ At last we apply electrical length and loss:
 \end{equation}
 where $c$ is the speed of light (299792458)
 \subsubsection{Load}
+\label{sec:loadstd}
 The load standard in DeEmbed can be defined as a perfect resistance ($R_l$) with a series inductance ($L_l$).
 \begin{equation}
 Z_{lp} = R_l + 2 \pi f \cdot L_l
 \end{equation}
 Convert $Z_{lp}$ into $\Gamma_{lp}$ with equation \ref{eqn:stoz}.
 \subsubsection{Through}
+\label{sec:throughstd}
 The through standard is only a connector between the two cables, we define the standard with only length and loss:
 \begin{itemize}
 	\item Loss(dB): Connector or trace loss of the standard

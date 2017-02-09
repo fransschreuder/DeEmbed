@@ -31,42 +31,42 @@ CalStdsDialog::CalStdsDialog(QWidget *parent, tCalStd* CalStd) :
     settings.beginGroup("CalStds");
     QString ActiveCalStd;
     tCalStd defaultCalStd = CalSpar::DefaultCalStd();
-    int NumberOfCalStds=settings.value("NumberOfCalStds", 1).toInt();
+    int NumberOfCalStds=settings.value("NumberOfCalStds", 0).toInt();
     if(NumberOfCalStds < 1)
     {
-        *m_CalStd = CalSpar::DefaultCalStd();
-        m_CalStds.push_back(*m_CalStd);
+        m_CalStds.push_back(CalSpar::IdealCalStd());
+        m_CalStds.push_back(CalSpar::DefaultCalStd());
+        NumberOfCalStds = 2;
     }
-    if(NumberOfCalStds < 1)
+    else
     {
-        NumberOfCalStds = 1;
-    }
-    for(int i=0; i<NumberOfCalStds; i++)
-    {
-        tCalStd cal;
-        QString cntStr;
-        cntStr.sprintf("CalStd%i",i);
-        cal.Name = settings.value(cntStr+"Name", tr("Default")).toString();
-        cal.L0 = settings.value(cntStr+"L0", defaultCalStd.L0).toDouble();
-        cal.L1 = settings.value(cntStr+"L1", defaultCalStd.L1).toDouble();
-        cal.L2 = settings.value(cntStr+"L2", defaultCalStd.L2).toDouble();
-        cal.L3 = settings.value(cntStr+"L3", defaultCalStd.L3).toDouble();
-        cal.LengthShort = settings.value(cntStr+"LengthShort", defaultCalStd.LengthShort).toDouble();
-        cal.LossdBShort = settings.value(cntStr+"LossdBShort", defaultCalStd.LossdBShort).toDouble();
-        cal.LossdBHzShort = settings.value(cntStr+"LossdBHzShort", defaultCalStd.LossdBHzShort).toDouble();
-        cal.C0 = settings.value(cntStr+"C0", defaultCalStd.C0).toDouble();
-        cal.C1 = settings.value(cntStr+"C1", defaultCalStd.C1).toDouble();
-        cal.C2 = settings.value(cntStr+"C2", defaultCalStd.C2).toDouble();
-        cal.C3 = settings.value(cntStr+"C3", defaultCalStd.C3).toDouble();
-        cal.LengthOpen = settings.value(cntStr+"LengthOpen", defaultCalStd.LengthOpen).toDouble();
-        cal.LossdBOpen = settings.value(cntStr+"LossdBOpen", defaultCalStd.LossdBOpen).toDouble();
-        cal.LossdBHzOpen = settings.value(cntStr+"LossdBHzOpen", defaultCalStd.LossdBHzOpen).toDouble();
-        cal.Ll = settings.value(cntStr+"Ll", defaultCalStd.Ll).toDouble();
-        cal.Rl = settings.value(cntStr+"Rl", defaultCalStd.Rl).toDouble();
-        cal.LengthThrough = settings.value(cntStr+"LengthThrough", defaultCalStd.LengthThrough).toDouble();
-        cal.LossdBThrough = settings.value(cntStr+"LossdBThrough", defaultCalStd.LossdBThrough).toDouble();
-        cal.LossdBHzThrough = settings.value(cntStr+"LossdBHzThrough", defaultCalStd.LossdBHzThrough).toDouble();
-        m_CalStds.push_back(cal);
+        for(int i=0; i<NumberOfCalStds; i++)
+        {
+            tCalStd cal;
+            QString cntStr;
+            cntStr.sprintf("CalStd%i",i);
+            cal.Name = settings.value(cntStr+"Name", tr("Default")).toString();
+            cal.L0 = settings.value(cntStr+"L0", defaultCalStd.L0).toDouble();
+            cal.L1 = settings.value(cntStr+"L1", defaultCalStd.L1).toDouble();
+            cal.L2 = settings.value(cntStr+"L2", defaultCalStd.L2).toDouble();
+            cal.L3 = settings.value(cntStr+"L3", defaultCalStd.L3).toDouble();
+            cal.LengthShort = settings.value(cntStr+"LengthShort", defaultCalStd.LengthShort).toDouble();
+            cal.LossdBShort = settings.value(cntStr+"LossdBShort", defaultCalStd.LossdBShort).toDouble();
+            cal.LossdBHzShort = settings.value(cntStr+"LossdBHzShort", defaultCalStd.LossdBHzShort).toDouble();
+            cal.C0 = settings.value(cntStr+"C0", defaultCalStd.C0).toDouble();
+            cal.C1 = settings.value(cntStr+"C1", defaultCalStd.C1).toDouble();
+            cal.C2 = settings.value(cntStr+"C2", defaultCalStd.C2).toDouble();
+            cal.C3 = settings.value(cntStr+"C3", defaultCalStd.C3).toDouble();
+            cal.LengthOpen = settings.value(cntStr+"LengthOpen", defaultCalStd.LengthOpen).toDouble();
+            cal.LossdBOpen = settings.value(cntStr+"LossdBOpen", defaultCalStd.LossdBOpen).toDouble();
+            cal.LossdBHzOpen = settings.value(cntStr+"LossdBHzOpen", defaultCalStd.LossdBHzOpen).toDouble();
+            cal.Ll = settings.value(cntStr+"Ll", defaultCalStd.Ll).toDouble();
+            cal.Rl = settings.value(cntStr+"Rl", defaultCalStd.Rl).toDouble();
+            cal.LengthThrough = settings.value(cntStr+"LengthThrough", defaultCalStd.LengthThrough).toDouble();
+            cal.LossdBThrough = settings.value(cntStr+"LossdBThrough", defaultCalStd.LossdBThrough).toDouble();
+            cal.LossdBHzThrough = settings.value(cntStr+"LossdBHzThrough", defaultCalStd.LossdBHzThrough).toDouble();
+            m_CalStds.push_back(cal);
+        }
     }
     ActiveCalStd = settings.value("ActiveCalStd", "Default").toString();
     *m_CalStd = defaultCalStd;

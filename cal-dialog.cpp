@@ -85,7 +85,7 @@ void CalDialog::openFile(void)
         {
             QSettings settings("Schreuder Electronics", "deembed");
             QString defaultPath = settings.value("DefaultPath", QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).toString();
-            QString path = QFileDialog::getOpenFileName(this, tr("Load calibration file"), defaultPath, tr("S1P files (*.s1p);;S2P files (*.S2P)"));
+            QString path = QFileDialog::getOpenFileName(this, tr("Load calibration file"), defaultPath, tr("TouchStone files (*.s1p *.s2p)"));
             settings.setValue("DefaultPath", QFileInfo(path).dir().absolutePath());
 
             if(!path.isEmpty())

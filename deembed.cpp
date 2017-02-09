@@ -120,7 +120,7 @@ void MainWindow::on_actionOpen_Touchstone_File_triggered()
 {
     QSettings settings("Schreuder Electronics", "deembed");
     QString defaultPath = settings.value("DefaultPath", QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).toString();
-    QString path = QFileDialog::getOpenFileName(this, tr("Load Touchstone file"), defaultPath, tr("S1P files (*.s1p);;S2P files (*.S2P);;S3P files (*.S3P);;S4P files (*.S4P)"));
+    QString path = QFileDialog::getOpenFileName(this, tr("Load Touchstone file"), defaultPath, tr("TouchStone files (*.s1p *.s2p *.s3p *.s4p)"));
     settings.setValue("DefaultPath", QFileInfo(path).dir().absolutePath());
     loadFile(path);
 }
@@ -211,6 +211,7 @@ void MainWindow::loadFile(const QString& path)
         }
         spar_t calSpar = m_calibrator.Cal(spar, m_cal);
         ui->chart->PutSpar(calSpar, -1, filename+"(cal)");
+        ui->chart->EnableSpar(0,0);
         adjustForCurrentFile(path);
     }
 

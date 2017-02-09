@@ -65,6 +65,7 @@ public:
     static bool TrimCal(cal_t& cal, double startfreq, double stopfreq, int NOP, cal_t *targetCal);
     ///! Just some nice values for a realistic calibration kit if you don't have data for your own.
 	static tCalStd DefaultCalStd(void);
+    static tCalStd IdealCalStd(void);
     ///! Creates the pointer to the (external) calibration standard (usually in the main window).l
     void SetCalStd(tCalStd* CalStd)
 	{
