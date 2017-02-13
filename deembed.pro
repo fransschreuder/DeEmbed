@@ -12,7 +12,7 @@ TARGET = deembed
 TEMPLATE = app
 
 win32 {
-    RC_FILE = myapp.rc
+    RC_FILE = deembed.rc
 }
 
 

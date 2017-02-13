@@ -27,11 +27,11 @@ software is free software: you can redistribute it and/or modify it
 
 #ifdef WIN32
 #include "shlwapi.h"
-int strcasecmp(const char* first, const char* second)
+/*int strcasecmp(const char* first, const char* second)
 {
  return lstrcmpiA(first,second);
 }
-#define M_PI 3.1415
+#define M_PI 3.1415*/
 #endif
 TouchstoneFile::TouchstoneFile ()
 {
