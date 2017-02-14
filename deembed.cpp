@@ -286,7 +286,9 @@ void MainWindow::on_actionCalibration_standards_triggered()
 
 void MainWindow::on_actionHelp_triggered()
 {
-    QDesktopServices::openUrl ( QUrl("http://github.com/fransschreuder/deembed/wiki") );
+    //QDesktopServices::openUrl ( QUrl("http://github.com/fransschreuder/deembed/wiki") );
+
+    QDesktopServices::openUrl ( QUrl(QCoreApplication::applicationDirPath()+"/../share/DeEmbed/doc/DeEmbed.pdf"));
 }
 
 void MainWindow::on_actionAbout_DeEmbed_triggered()

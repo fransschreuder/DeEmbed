@@ -11,6 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = deembed
 TEMPLATE = app
 
+win32 {
+    RC_FILE = deembed.rc
+}
+
 
 SOURCES += main.cpp\
         deembed.cpp \
@@ -61,8 +65,12 @@ target.path = $${PREFIX}/bin
 EXAMPLES.files = examples/*
 EXAMPLES.path = $${PREFIX}/share/DeEmbed/examples
 
+DOCFILES.files = doc/DeEmbed.pdf
+DOCFILES.path  = $${PREFIX}/share/DeEmbed/doc
+
 INSTALLS += target
 INSTALLS += ICO
 INSTALLS += DESK
 INSTALLS += EXAMPLES
+INSTALLS += DOCFILES
 
