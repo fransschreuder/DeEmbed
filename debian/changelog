@@ -1,3 +1,9 @@
+deembed (1.5-1) trusty; urgency=medium
+
+  * Fixed calibration method for two ports, according to Agilent documentation
+
+ -- Frans Schreuder <info@schreuderelectronics.com>  Thu, 09 Feb 2017 16:49:46 +0100
+
 deembed (1.4-1) trusty; urgency=medium
 
   * Show warning (statusbar) when s-parameter is not calibrated
