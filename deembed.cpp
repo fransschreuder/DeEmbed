@@ -287,8 +287,14 @@ void MainWindow::on_actionCalibration_standards_triggered()
 void MainWindow::on_actionHelp_triggered()
 {
     //QDesktopServices::openUrl ( QUrl("http://github.com/fransschreuder/deembed/wiki") );
+    QString appPath = QCoreApplication::applicationDirPath().replace("/bin","");
+    QUrl helpUrl = QUrl("file://"+appPath+"/share/DeEmbed/doc/DeEmbed.pdf");
+    if(!QDesktopServices::openUrl ( helpUrl))
+    {
+        QDesktopServices::openUrl ( QUrl("http://github.com/fransschreuder/deembed/wiki") );
+        //QMessageBox::warning(this,"Could not open help file", helpUrl.toString());
+    }
 
-    QDesktopServices::openUrl ( QUrl(QCoreApplication::applicationDirPath()+"/../share/DeEmbed/doc/DeEmbed.pdf"));
 }
 
 void MainWindow::on_actionAbout_DeEmbed_triggered()
