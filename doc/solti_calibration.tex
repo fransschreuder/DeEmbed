@@ -174,7 +174,7 @@ e_{23}e_{01} = \left(\frac{S_{12t}}{S_{12s}} - e_{03}\right)\left(1-e_{22}e'_{11
 \end{equation}
 
 The 12-term calibration method from Agilent \cite{agilent_calibration} does not mention any through standard in its equations, Equations \ref{eqn:e'11} to \ref{eqn:e23e01} are slightly modified with respect to \cite{agilent_calibration}, the Through and Reflect measurements $S_{11t}$, $S_{21t}$, $S_{12t}$ and $S_{22t}$ are compensated with (divided by) the known through standard \ref{sec:throughstd}
-
+\newpage
 \subsection{3 Port SOLTI Calibration}
 \label{sec:3psoltical}
 
@@ -184,6 +184,204 @@ The 12-term calibration method from Agilent \cite{agilent_calibration} does not 
 	\caption{Three port model}
 	\label{fig:threeportmodel}
 \end{figure}
+\begin{equation}
+\begin{split}
+D = \left[1+\frac{S_{11M}-e_{44}}{e_{14}e_{41}}e_{11}\right]
+\left[1+\frac{S_{22M}-e_{55}}{e_{25}e_{52}}e_{22}\right]
+\left[1+\frac{S_{33M}-e_{66}}{e_{36}e_{63}}e_{33}\right] \\
+-\frac{S_{21M}-e_{54}}{e_{14}e_{52}}
+\frac{S_{12M}-e_{45}}{e_{25}e_{41}}
+e'_{22}e'_{11} \\
+-\frac{S_{31M}-e_{64}}{e_{14}e_{63}}
+\frac{S_{13M}-e_{46}}{e_{36}e_{41}}
+e'_{33}e''_{11} \\
+-\frac{S_{32M}-e_{65}}{e_{25}e_{63}}
+\frac{S_{23M}-e_{56}}{e_{36}e_{52}}
+e''_{33}e''_{22}
+\end{split}
+\end{equation}
+
+\begin{equation}
+S_{11}=
+	\frac{
+	\left(\begin{split}
+	\frac{S_{11M}-e_{44}}{e_{14}e_{41}}
+	\left[ 1+\frac{S_{22M}-e_{55}}{e_{25}e_{52}}e_{22}\right]
+	\left[ 1+\frac{S_{33M}-e_{66}}{e_{26}e_{62}}e_{33}\right]-\\
+	e'_{22}\frac{S_{21M}-e_{54}}{e_{14}e_{52}}\frac{S_{12M}-e_{45}}{e_{25}e_{41}}-\\
+	e'_{33}\frac{S_{31M}-e_{64}}{e_{14}e_{62}}\frac{S_{13M}-e_{46}}{e_{26}e_{41}}	
+	\end{split}\right)
+	} {D}
+\end{equation}
+
+\begin{equation}
+S_{22}=
+\frac{
+	\left(\begin{split}
+	\frac{S_{22M}-e_{55}}{e_{25}e_{52}}
+	\left[ 1+\frac{S_{11M}-e_{44}}{e_{14}e_{41}}e_{11}\right]
+	\left[ 1+\frac{S_{33M}-e_{66}}{e_{36}e_{63}}e_{33}\right]-\\
+	e'_{11}\frac{S_{12M}-e_{45}}{e_{25}e_{41}}\frac{S_{21M}-e_{54}}{e_{14}e_{52}}-\\
+	e''_{33}\frac{S_{31M}-e_{64}}{e_{14}e_{62}}\frac{S_{13M}-e_{46}}{e_{26}e_{41}}	
+	\end{split}\right)
+} {D}
+\end{equation}
+
+\begin{equation}
+S_{33}=
+\frac{
+	\left(\begin{split}
+	\frac{S_{33M}-e_{66}}{e_{36}e_{63}}
+	\left[ 1+\frac{S_{11M}-e_{44}}{e_{14}e_{41}}e_{11}\right]
+	\left[ 1+\frac{S_{22M}-e_{55}}{e_{25}e_{52}}e_{22}\right]-\\
+	e''_{11}\frac{S_{12M}-e_{45}}{e_{25}e_{41}}\frac{S_{21M}-e_{54}}{e_{14}e_{52}}-\\	
+	e''_{22}\frac{S_{21M}-e_{54}}{e_{14}e_{52}}\frac{S_{12M}-e_{45}}{e_{25}e_{41}}
+	\end{split}\right)
+} {D}
+\end{equation}
+
+\begin{equation}
+S_{21} = \frac{\frac{S_{21M}-e_{54}}{e_{14}e_{52}}\left[1+\frac{S_{22M}-e_{55}}{e_{25}e_{52}}(e_{22}-e'_{22})\right]}{D}
+\end{equation}
+\begin{equation}
+S_{12} = \frac{\frac{S_{12M}-e_{45}}{e_{25}e_{41}}\left[1+\frac{S_{11M}-e_{44}}{e_{14}e_{41}}(e_{11}-e'_{11})\right]}{D}
+\end{equation}
+
+\begin{equation}
+S_{31} = \frac{\frac{S_{31M}-e_{64}}{e_{14}e_{63}}\left[1+\frac{S_{33M}-e_{66}}{e_{36}e_{63}}(e_{33}-e'_{33})\right]}{D}
+\end{equation}
+\begin{equation}
+S_{13} = \frac{\frac{S_{13M}-e_{46}}{e_{36}e_{41}}\left[1+\frac{S_{11M}-e_{44}}{e_{14}e_{41}}(e_{11}-e''_{11})\right]}{D}
+\end{equation}
+
+\begin{equation}
+S_{32} = \frac{\frac{S_{32M}-e_{65}}{e_{25}e_{63}}\left[1+\frac{S_{33M}-e_{66}}{e_{36}e_{63}}(e_{33}-e''_{33})\right]}{D}
+\end{equation}
+\begin{equation}
+S_{23} = \frac{\frac{S_{23M}-e_{56}}{e_{36}e_{52}}\left[1+\frac{S_{22M}-e_{55}}{e_{25}e_{52}}(e_{22}-e''_{22})\right]}{D}
+\end{equation}
+
+
+
+\newpage
+\begin{itemize}
+	\item $e_{44}$: Port 1 directivity
+	\item $e_{55}$: Port 2 directivity
+	\item $e_{66}$: Port 3 directivity
+	\item $e_{11}$: Port 1 match
+	\item $e'_{11}$: Port 1 match seen from port 2
+	\item $e''_{11}$: Port 1 match seen from port 3
+	\item $e_{22}$: Port 2 match
+	\item $e'_{22}$: Port 2 match seen from port 1
+	\item $e''_{22}$: Port 2 match seen from port 3
+	\item $e_{33}$: Port 3 match
+	\item $e'_{33}$: Port 3 match seen from port 1
+	\item $e''_{33}$: Port 3 match seen from port 2
+	\item $e_{14}e_{41}$: Port 1 reflection tracking
+	\item $e_{25}e_{52}$: Port 2 reflection tracking
+	\item $e_{36}e_{63}$: Port 3 reflection tracking
+	\item $e_{14}e_{52}$: P1 to P2 transmission tracking
+	\item $e_{25}e_{41}$: P2 to P1 transmission tracking
+	\item $e_{14}e_{63}$: P1 to P3 transmission tracking
+	\item $e_{36}e_{41}$: P3 to P1 transmission tracking
+	\item $e_{36}e_{52}$: P2 to P3 transmission tracking
+	\item $e_{25}e_{63}$: P3 to P2 transmission tracking
+	\item $e_{54}$: P1 to P2 transmission leakage
+	\item $e_{45}$: P2 to P1 transmission leakage
+	\item $e_{64}$: P1 to P3 transmission leakage
+	\item $e_{46}$: P3 to P1 transmission leakage
+	\item $e_{65}$: P2 to P3 transmission leakage
+	\item $e_{56}$: P3 to P2 transmission leakage
+\end{itemize}
+
+\subsubsection{obtaining the error coefficients for 3 port SOLTI Calibration}
+\label{sec:obtaining3psolti}
+The 3 port Through - Isolation calibration depends on the SOL calibration, this calibration has to be done first. 
+$e_{44}$, $e_{11}$ and $\Delta_{eP1}$ are obtained from the measurements in \ref{sec:obtainingerrorcoefsSOL}, $e_{55}$, $e_{22}$ and $\Delta_{eP2}$ use the same equations but with Short / Open / Load measurements taken from port 2, $e_{66}$, $e_{33}$ and $\Delta_{eP3}$ use the same equations but with Short / Open / Load measurements taken from port 3. 
+\begin{itemize}
+	\item {$e_{44}$, $e_{55}$ and $e_{66}$ are obtained from equation \ref{eqn:e00}}
+	\item {$e_{11}$, $e_{22}$ and $e_{33}$ are obtained from equation \ref{eqn:e11}}	
+	\item {$\Delta_{eP1}$, $\Delta_{eP2}$ and $\Delta_{eP3}$ are obtained from equation \ref{eqn:deltae}}
+\end{itemize}
+
+\begin{equation}
+(e_{14}e_{41}) = -\Delta_{eP1}+e_{11}e_{44}
+\end{equation}
+\begin{equation}
+(e_{25}e_{52}) = -\Delta_{eP2}+e_{22}e_{55}
+\end{equation}
+\begin{equation}
+(e_{36}e_{63}) = -\Delta_{eP3}+e_{33}e_{66}
+\end{equation}
+
+For the next set of equations, we determine 5 sets of 3-port s-parameter matrices, as described in \ref{sec:obtainingsolti}.
+
+The 3 port isolation measurement file is created with the measurement cables connected to a 50$\Omega$ load. From this file the following error terms are obtained:
+\begin{itemize}
+	\item $e_{54} = S_{21i}$, this is the P1 to P2 isolation
+	\item $e_{45} = S_{12i}$, this is the P2 to P1 isolation
+	\item $e_{64} = S_{31i}$, this is the P1 to P3 isolation
+	\item $e_{46} = S_{13i}$, this is the P3 to P1 isolation
+	\item $e_{65} = S_{32i}$, this is the P2 to P3 isolation
+	\item $e_{56} = S_{23i}$, this is the P3 to P2 isolation
+\end{itemize}
+
+
+
+$e'_{22}$ and $e''_{22}$ is in fact the same error term as $e_{22}$, but it is seen from port 1 or port 3 respectively, for that reason we use a different calculation. Instead we use the SOL calibration method to de-embed the reflection measured at the through measurement $S_{11t}$, normalized to the standard $S_{21s}$. The same is true for $e'_{11}$, $e''_{11}$, $e'_{33}$ and $e''_{33}$. 
+
+\begin{equation}
+\label{eqn:e'11_3p}
+e'_{11} = \frac{\frac{S_{22t}}{S_{12s}}-e_{55}}{\frac{S_{22t}}{S_{12s}}e_{22}-\Delta_{eP2}}
+\end{equation}
+\begin{equation}
+\label{eqn:e''11_3p}
+e''_{11} = \frac{\frac{S_{33t}}{S_{13s}}-e_{66}}{\frac{S_{33t}}{S_{13s}}e_{22}-\Delta_{eP3}}
+\end{equation}
+\begin{equation}
+\label{eqn:e'22_3p}
+e'_{22} = \frac{\frac{S_{11}}{S_{21s}}-e_{44}}{\frac{S_{11t}}{S_{21s}}e_{11}-\Delta_{eP1}}
+\end{equation}
+\begin{equation}
+\label{eqn:e''22_3p}
+e''_{22} = \frac{\frac{S_{33t}}{S_{23s}}-e_{66}}{\frac{S_{33t}}{S_{23s}}e_{33}-\Delta_{eP3}}
+\end{equation}
+\begin{equation}
+\label{eqn:e'33_3p}
+e'_{33} = \frac{\frac{S_{11t}}{S_{31s}}-e_{44}}{\frac{S_{11t}}{S_{31s}}e_{11}-\Delta_{eP1}}
+\end{equation}
+\begin{equation}
+\label{eqn:e''33_3p}
+e''_{33} = \frac{\frac{S_{22t}}{S_{32s}}-e_{55}}{\frac{S_{22t}}{S_{32s}}e_{22}-\Delta_{eP2}}
+\end{equation}
+
+\begin{equation}
+\label{eqn:e14e52_3p}
+e_{14}e_{52} = \left(\frac{S_{21t}}{S_{21s}} - e_{54}\right)\left(1-e_{11}e'_{22}\right)
+\end{equation}
+\begin{equation}
+\label{eqn:e25e41_3p}
+e_{25}e_{41} = \left(\frac{S_{12t}}{S_{12s}} - e_{45}\right)\left(1-e_{22}e'_{11}\right)
+\end{equation}
+
+\begin{equation}
+\label{eqn:e14e63_3p}
+e_{14}e_{63} = \left(\frac{S_{31t}}{S_{31s}} - e_{64}\right)\left(1-e_{11}e'_{33}\right)
+\end{equation}
+\begin{equation}
+\label{eqn:e36e41_3p}
+e_{36}e_{41} = \left(\frac{S_{13t}}{S_{13s}} - e_{46}\right)\left(1-e_{33}e'_{11}\right)
+\end{equation}
+
+\begin{equation}
+\label{eqn:e25e63_3p}
+e_{25}e_{63} = \left(\frac{S_{32t}}{S_{32s}} - e_{65}\right)\left(1-e_{22}e'_{33}\right)
+\end{equation}
+\begin{equation}
+\label{eqn:e36e52_3p}
+e_{36}e_{52} = \left(\frac{S_{23t}}{S_{23s}} - e_{56}\right)\left(1-e_{33}e'_{22}\right)
+\end{equation}
+
 
 
 \subsection{Calibration Standards}

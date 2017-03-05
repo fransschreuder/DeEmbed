@@ -16,6 +16,8 @@ do
         done
     done
     sed -ri 's/\\ensuremath\{\\backslash\}/\\/g' $FILE
-    sed -i 's/\\_M\$/_\{M\}\$/g' $FILE
+    sed -ri 's/\\_M\$/_\{M\}\$/g' $FILE
 
 done
+
+sed -ri 's/\\begin\{tikzpicture\}/\\begin\{tikzpicture\}\[scale=0.75\]/g' ThreePortModel.tex
