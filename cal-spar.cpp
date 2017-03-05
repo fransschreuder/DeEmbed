@@ -136,7 +136,7 @@ vector<complex_t> CalSpar::SOLCal(vector<complex_t>& rawS1P, vector<complex_t>& 
     return calS1P;
 }
 
-void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> throughS21, vector<complex_t> isolationS21,vector<complex_t> reflectS21,
+void CalSpar::TwoPortCal(vector<complex_t> rawS21, vector<complex_t> throughS21, vector<complex_t> isolationS21,vector<complex_t> reflectS21,
                                                vector<complex_t> rawS12, vector<complex_t> throughS12, vector<complex_t> isolationS12,vector<complex_t> reflectS12,
                                                vector<complex_t> rawS11, vector<complex_t> shortS11, vector<complex_t> openS11, vector<complex_t> loadS11,
                                                vector<complex_t> rawS22, vector<complex_t> shortS22, vector<complex_t> openS22, vector<complex_t> loadS22,
@@ -146,6 +146,8 @@ void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> th
 
     *calS21 = rawS21;
     *calS12 = rawS12;
+    *calS11 = rawS11;
+    *calS22 = rawS22;
 
     for(int i=0;i<(int)rawS21.size();i++)
 	{
@@ -195,12 +197,172 @@ void CalSpar::ThroughIsolationCal(vector<complex_t> rawS21, vector<complex_t> th
 }
 
 
+///! Executes a Through (+isolation) calibration on a 3-port trace, including SOL cal (S21, S12, S31, S13, S32, S23 etc)
+void CalSpar::ThreePortCal(                    vector<complex_t> rawS12, vector<complex_t> throughS12, vector<complex_t> isolationS12,vector<complex_t> reflectS12,
+                                      vector<complex_t> rawS13, vector<complex_t> throughS13, vector<complex_t> isolationS13,vector<complex_t> reflectS13,
+                                      vector<complex_t> rawS21, vector<complex_t> throughS21, vector<complex_t> isolationS21,vector<complex_t> reflectS21,
+                                      vector<complex_t> rawS23, vector<complex_t> throughS23, vector<complex_t> isolationS23,vector<complex_t> reflectS23,
+                                      vector<complex_t> rawS31, vector<complex_t> throughS31, vector<complex_t> isolationS31,vector<complex_t> reflectS31,
+                                      vector<complex_t> rawS32, vector<complex_t> throughS32, vector<complex_t> isolationS32,vector<complex_t> reflectS32,
+
+                                      vector<complex_t> rawS11, vector<complex_t> shortS11, vector<complex_t> openS11, vector<complex_t> loadS11,
+                                      vector<complex_t> rawS22, vector<complex_t> shortS22, vector<complex_t> openS22, vector<complex_t> loadS22,
+                                      vector<complex_t> rawS33, vector<complex_t> shortS33, vector<complex_t> openS33, vector<complex_t> loadS33,
+                                      vector<double> f,
+                                      vector<complex_t>* calS12, vector<complex_t>* calS13,
+                                      vector<complex_t>* calS21, vector<complex_t>* calS23,
+                                      vector<complex_t>* calS31, vector<complex_t>* calS32,
+
+                                      vector<complex_t>* calS11, vector<complex_t>* calS22, vector<complex_t>* calS33)
+{
+    *calS12 = rawS12;
+    *calS13 = rawS13;
+    *calS21 = rawS21;
+    *calS23 = rawS23;
+    *calS31 = rawS31;
+    *calS32 = rawS32;
+    *calS11 = rawS11;
+    *calS22 = rawS22;
+    *calS33 = rawS33;
+
+    for(int i=0;i<(int)f.size();i++)
+    {
+        complex_t Gth = stdThrough(f[i]);
+        complex_t Gsp = stdShort(f[i]);
+        complex_t Gop = stdOpen(f[i]);
+        complex_t Glp = stdLoad(f[i]);
+        complex_t e44, e11, de_P1;
+        Port1ErrorTerms(Gsp, Gop, Glp, shortS11[i], openS11[i], loadS11[i], &e44, &e11, &de_P1);
+
+        complex_t e55, e22, de_P2;
+        Port1ErrorTerms(Gsp, Gop, Glp, shortS22[i], openS22[i], loadS22[i], &e55, &e22, &de_P2);
+
+        complex_t e66, e33, de_P3;
+        Port1ErrorTerms(Gsp, Gop, Glp, shortS33[i], openS33[i], loadS33[i], &e66, &e33, &de_P3);
+
+        complex_t e14e41 = -de_P1+(e11*e44);
+        complex_t e25e52 = -de_P2+(e22*e55);
+        complex_t e36e63 = -de_P3+(e33*e66);
+
+        complex_t e54 = isolationS21[i];
+        complex_t e45 = isolationS12[i];
+        complex_t e64 = isolationS31[i];
+        complex_t e46 = isolationS13[i];
+        complex_t e65 = isolationS32[i];
+        complex_t e56 = isolationS23[i];
+
+        complex_t ee11  = ((reflectS12[i]/Gth)-e55)/(((reflectS12[i]/Gth)*e22)-de_P2);
+        complex_t eee11 = ((reflectS13[i]/Gth)-e66)/(((reflectS13[i]/Gth)*e22)-de_P3);
+        complex_t ee22  = ((reflectS21[i]/Gth)-e44)/(((reflectS21[i]/Gth)*e11)-de_P1);
+        complex_t eee22 = ((reflectS23[i]/Gth)-e66)/(((reflectS23[i]/Gth)*e33)-de_P3);
+        complex_t ee33  = ((reflectS31[i]/Gth)-e44)/(((reflectS31[i]/Gth)*e11)-de_P1);
+        complex_t eee33 = ((reflectS32[i]/Gth)-e55)/(((reflectS32[i]/Gth)*e22)-de_P2);
+
+        complex_t e14e52 = ((throughS21[i]/Gth) - e54)*(complex_t(1,0)-(e11*ee22));
+        complex_t e25e41 = ((throughS12[i]/Gth) - e45)*(complex_t(1,0)-(e22*ee11));
+        complex_t e14e63 = ((throughS31[i]/Gth) - e64)*(complex_t(1,0)-(e11*ee33));
+        complex_t e36e41 = ((throughS13[i]/Gth) - e46)*(complex_t(1,0)-(e33*eee11));
+        complex_t e25e63 = ((throughS32[i]/Gth) - e65)*(complex_t(1,0)-(e22*eee33));
+        complex_t e36e52 = ((throughS23[i]/Gth) - e56)*(complex_t(1,0)-(e33*eee22));
+
+        complex_t D = (complex_t(1,0)+((rawS11[i]-e44)/(e14e41))*e11)*
+                      (complex_t(1,0)+((rawS22[i]-e55)/(e25e52))*e22)*
+                      (complex_t(1,0)+((rawS33[i]-e66)/(e36e63))*e33)
+                      -((rawS21[i]-e54)/e14e52)*
+                      ((rawS12[i]-e45)/e25e41)*
+                       ee22*ee11
+                      -((rawS31[i]-e64)/e14e63)*
+                      ((rawS13[i]-e46)/e36e41)*
+                       ee33*eee11-
+                      -((rawS32[i]-e65)/e25e63)*
+                      ((rawS23[i]-e56)/e36e52)*
+                       eee33*eee22;
+
+        (*calS21)[i] = (((rawS21[i]-e54)/(e14e52))*(complex_t(1,0)+((rawS22[i]-e55)/(e25e52))*(e22-ee22)))/D;
+        (*calS12)[i] = (((rawS12[i]-e45)/(e25e41))*(complex_t(1,0)+((rawS11[i]-e44)/(e14e41))*(e11-ee11)))/D;
+        (*calS31)[i] = (((rawS31[i]-e64)/(e14e63))*(complex_t(1,0)+((rawS33[i]-e66)/(e36e63))*(e33-ee33)))/D;
+        (*calS13)[i] = (((rawS13[i]-e46)/(e36e41))*(complex_t(1,0)+((rawS11[i]-e44)/(e14e41))*(e11-eee11)))/D;
+        (*calS32)[i] = (((rawS32[i]-e65)/(e25e63))*(complex_t(1,0)+((rawS33[i]-e66)/(e36e63))*(e33-eee33)))/D;
+        (*calS23)[i] = (((rawS23[i]-e56)/(e36e52))*(complex_t(1,0)+((rawS22[i]-e55)/(e25e52))*(e22-eee22)))/D;
+
+
+        (*calS11)[i] = (((rawS11[i]-e44)/(e14e41))*
+                        (complex_t(1,0)+((rawS22[i]-e55)/(e25e52)*e22))*
+                        (complex_t(1,0)+((rawS33[i]-e66)/(e36e63)*e33))
+                        -(ee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41)))
+                        -(ee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
+#warning TODO  S22 and S33
+        (*calS22)[i] = (((rawS11[i]-e44)/(e14e41))*
+                        (complex_t(1,0)+((rawS22[i]-e55)/(e25e52)*e22))*
+                        (complex_t(1,0)+((rawS33[i]-e66)/(e36e63)*e33))
+                        -(ee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41)))
+                        -(ee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
+
+        (*calS33)[i] = (((rawS11[i]-e44)/(e14e41))*
+                        (complex_t(1,0)+((rawS22[i]-e55)/(e25e52)*e22))*
+                        (complex_t(1,0)+((rawS33[i]-e66)/(e36e63)*e33))
+                        -(ee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41)))
+                        -(ee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
+
+
+    }
+}
+
+///! Executes a Through (+isolation) calibration on a 4-port trace, including SOL cal (S21, S12, S31, S13, S32, S23 etc)
+void CalSpar::FourPortCal(                     vector<complex_t> rawS12, vector<complex_t> throughS12, vector<complex_t> isolationS12,vector<complex_t> reflectS12,
+                                      vector<complex_t> rawS13, vector<complex_t> throughS13, vector<complex_t> isolationS13,vector<complex_t> reflectS13,
+                                      vector<complex_t> rawS14, vector<complex_t> throughS14, vector<complex_t> isolationS14,vector<complex_t> reflectS14,
+                                      vector<complex_t> rawS21, vector<complex_t> throughS21, vector<complex_t> isolationS21,vector<complex_t> reflectS21,
+                                      vector<complex_t> rawS23, vector<complex_t> throughS23, vector<complex_t> isolationS23,vector<complex_t> reflectS23,
+                                      vector<complex_t> rawS24, vector<complex_t> throughS24, vector<complex_t> isolationS24,vector<complex_t> reflectS24,
+                                      vector<complex_t> rawS31, vector<complex_t> throughS31, vector<complex_t> isolationS31,vector<complex_t> reflectS31,
+                                      vector<complex_t> rawS32, vector<complex_t> throughS32, vector<complex_t> isolationS32,vector<complex_t> reflectS32,
+                                      vector<complex_t> rawS34, vector<complex_t> throughS34, vector<complex_t> isolationS34,vector<complex_t> reflectS34,
+                                      vector<complex_t> rawS41, vector<complex_t> throughS41, vector<complex_t> isolationS41,vector<complex_t> reflectS41,
+                                      vector<complex_t> rawS42, vector<complex_t> throughS42, vector<complex_t> isolationS42,vector<complex_t> reflectS42,
+                                      vector<complex_t> rawS43, vector<complex_t> throughS43, vector<complex_t> isolationS43,vector<complex_t> reflectS43,
+
+                                      vector<complex_t> rawS11, vector<complex_t> shortS11, vector<complex_t> openS11, vector<complex_t> loadS11,
+                                      vector<complex_t> rawS22, vector<complex_t> shortS22, vector<complex_t> openS22, vector<complex_t> loadS22,
+                                      vector<complex_t> rawS33, vector<complex_t> shortS33, vector<complex_t> openS33, vector<complex_t> loadS33,
+                                      vector<complex_t> rawS44, vector<complex_t> shortS44, vector<complex_t> openS44, vector<complex_t> loadS44,
+                                      vector<double> f,
+                                      vector<complex_t>* calS12, vector<complex_t>* calS13, vector<complex_t>* calS14,
+                                      vector<complex_t>* calS21, vector<complex_t>* calS23, vector<complex_t>* calS24,
+                                      vector<complex_t>* calS31, vector<complex_t>* calS32, vector<complex_t>* calS34,
+                                      vector<complex_t>* calS41, vector<complex_t>* calS42, vector<complex_t>* calS43,
+
+                                      vector<complex_t>* calS11, vector<complex_t>* calS22, vector<complex_t>* calS33, vector<complex_t>* calS44)
+{
+#warning TODO
+
+    *calS12 = rawS12;
+    *calS13 = rawS13;
+    *calS14 = rawS14;
+    *calS21 = rawS21;
+    *calS23 = rawS23;
+    *calS24 = rawS24;
+    *calS31 = rawS31;
+    *calS32 = rawS32;
+    *calS34 = rawS34;
+    *calS41 = rawS41;
+    *calS42 = rawS42;
+    *calS43 = rawS43;
+    *calS11 = rawS11;
+    *calS22 = rawS22;
+    *calS33 = rawS33;
+    *calS44 = rawS44;
+}
+
+
+
+
 spar_t CalSpar::Cal(spar_t& S, cal_t& cal)
 {
 	spar_t Sc;
 	Sc=S;
     QStringList warningStrings;
-    if(S.S.size()==0)
+    if(S.S.size()==1)
     {
         if(cal.P1ShortDone&&cal.P1OpenDone&&cal.P1LoadDone)
         {
@@ -244,11 +406,11 @@ spar_t CalSpar::Cal(spar_t& S, cal_t& cal)
             warningStrings.push_back("S44");
         }
     }
-    if(S.S.size()>1)
+    if(S.S.size()==2)
     {
         if(cal.P12ThroughDone)
         {
-            ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
+            TwoPortCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
                                 S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
                                 S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
                                 S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f,
@@ -261,83 +423,84 @@ spar_t CalSpar::Cal(spar_t& S, cal_t& cal)
             warningStrings.push_back("S12");
         }
     }
-    if(S.S.size()>2)
+    if(S.S.size()==3)
     {
-        if(cal.P13ThroughDone)
+        if(cal.P12ThroughDone&&cal.P13ThroughDone&&cal.P23ThroughDone)
         {
-            ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
-                                S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
-                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
-                                &(Sc.S[2][0]), &(Sc.S[0][2]), &(Sc.S[0][0]), &(Sc.S[2][2]));
+            ThreePortCal(   S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
+                            S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
+                            S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
+                            S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
+                            S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
+                            S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
+
+                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
+
+                            &(Sc.S[0][1]), &(Sc.S[0][2]),
+                            &(Sc.S[1][0]), &(Sc.S[1][2]),
+                            &(Sc.S[2][0]), &(Sc.S[2][1]),
+
+                            &(Sc.S[0][0]), &(Sc.S[1][1]), &(Sc.S[2][2]));
         }
         else
         {
-            warningStrings.push_back("S31");
+            warningStrings.push_back("S12");
             warningStrings.push_back("S13");
-        }
-    }
-    if(S.S.size()>3)
-    {
-        if(cal.P14ThroughDone)
-        {
-            ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
-                                S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
-                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                                &(Sc.S[3][0]), &(Sc.S[0][3]), &(Sc.S[0][0]), &(Sc.S[3][3]));
-        }
-        else
-        {
-            warningStrings.push_back("S41");
-            warningStrings.push_back("S14");
-        }
-    }
-    if(S.S.size()>2)
-    {
-        if(cal.P23ThroughDone)
-        {
-            ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
-                                S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
-                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
-                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
-                                &(Sc.S[2][1]), &(Sc.S[1][2]), &(Sc.S[1][1]), &(Sc.S[2][2]));
-        }
-        else
-        {
-            warningStrings.push_back("S32");
+            warningStrings.push_back("S21");
             warningStrings.push_back("S23");
+            warningStrings.push_back("S31");
+            warningStrings.push_back("S32");
         }
     }
     if(S.S.size()>3)
     {
-        if(cal.P24ThroughDone)
+        if(     cal.P12ThroughDone&&cal.P13ThroughDone&&cal.P14ThroughDone&&
+                cal.P23ThroughDone&&cal.P24ThroughDone&&
+                cal.P34ThroughDone)
         {
-            ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
-                                S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
-                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
-                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                                &(Sc.S[3][1]), &(Sc.S[1][3]), &(Sc.S[1][1]), &(Sc.S[3][3]));
+            FourPortCal(   S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
+                            S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
+                            S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
+                            S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
+                            S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
+                            S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
+                            S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
+                            S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
+                            S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
+                            S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
+                            S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
+                            S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
+                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
+                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
+                            S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
+                            S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
+
+                            &(Sc.S[0][1]), &(Sc.S[0][2]), &(Sc.S[0][3]),
+                            &(Sc.S[1][0]), &(Sc.S[1][2]), &(Sc.S[1][3]),
+                            &(Sc.S[2][0]), &(Sc.S[2][1]), &(Sc.S[2][3]),
+                            &(Sc.S[3][0]), &(Sc.S[3][1]), &(Sc.S[3][2]),
+
+                            &(Sc.S[0][0]), &(Sc.S[1][1]), &(Sc.S[2][2]), &(Sc.S[3][3]));
         }
         else
         {
-            warningStrings.push_back("S42");
+            warningStrings.push_back("S12");
+            warningStrings.push_back("S13");
+            warningStrings.push_back("S14");
+            warningStrings.push_back("S21");
+            warningStrings.push_back("S23");
             warningStrings.push_back("S24");
-        }
-        if(cal.P34ThroughDone)
-        {
-            ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
-                                S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
-                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
-                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                                &(Sc.S[3][2]), &(Sc.S[2][3]), &(Sc.S[2][2]), &(Sc.S[3][3]));
-        }
-        else
-        {
-            warningStrings.push_back("S43");
+            warningStrings.push_back("S31");
+            warningStrings.push_back("S32");
             warningStrings.push_back("S34");
+            warningStrings.push_back("S41");
+            warningStrings.push_back("S42");
+            warningStrings.push_back("S43");
         }
     }
+
     if(warningStrings.size()>0)
     {
         emit CalibrationWarning(warningStrings.join(',')+" not calibrated");
@@ -345,119 +508,6 @@ spar_t CalSpar::Cal(spar_t& S, cal_t& cal)
 	return Sc;
 }
 
-vector<complex_t> CalSpar::Cal(spar_t S, int index1, int index2, cal_t& cal)
-{
-	vector<complex_t> Sc;
-    Sc=S.S[index1][index2];
-	if(cal.P1ShortDone&&cal.P1OpenDone&&cal.P1LoadDone&&index1==0&&index2==0)
-	{
-        Sc=SOLCal(S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 1 uncalibrated"<<endl;
-	}
-	if(cal.P2ShortDone&&cal.P2OpenDone&&cal.P2LoadDone&&index1==1&&index2==1)
-	{
-        Sc=SOLCal(S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 2 uncalibrated"<<endl;
-	}
-	if(cal.P3ShortDone&&cal.P3OpenDone&&cal.P3LoadDone&&index1==2&&index2==2)
-	{
-        Sc=SOLCal(S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 3 uncalibrated"<<endl;
-	}
-	if(cal.P4ShortDone&&cal.P4OpenDone&&cal.P4LoadDone&&index1==3&&index2==3)
-	{
-        Sc=SOLCal(S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f);
-	}
-	else 
-	{
-		//cout<<"Warning: Port 4 uncalibrated"<<endl;
-	}
-
-	if(cal.P12ThroughDone)
-	{
-        vector<complex_t> Sc1, Sc2, Sc3, Sc4;
-        if((index1==1&&index2==0)||(index1==0&&index2==1))
-            ThroughIsolationCal(S.S[1][0], cal.Through21, cal.Isolation21, cal.Reflect21,
-                            S.S[0][1], cal.Through12, cal.Isolation12, cal.Reflect12,
-                            S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                            S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,cal.f,
-                            &Sc1, &Sc2, &Sc3, &Sc4);
-
-        if(index1==1&&index2==0)Sc=Sc1;
-        if(index1==0&&index2==1)Sc=Sc2;
-	}
-	if(cal.P13ThroughDone)
-	{
-        vector<complex_t> Sc1, Sc2, Sc3, Sc4;
-        if((index1==2&&index2==0)||(index1==0&&index2==2))
-            ThroughIsolationCal(S.S[2][0], cal.Through31, cal.Isolation31, cal.Reflect31,
-                                S.S[0][2], cal.Through13, cal.Isolation13, cal.Reflect13,
-                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
-                            &Sc1, &Sc2, &Sc3, &Sc4);
-
-        if(index1==2&&index2==0)Sc=Sc1;
-        if(index1==0&&index2==2)Sc=Sc2;	}
-	if(cal.P14ThroughDone)
-	{
-        vector<complex_t> Sc1, Sc2, Sc3, Sc4;
-        if((index1==3&&index2==0)||(index1==0&&index2==3))
-            ThroughIsolationCal(S.S[3][0], cal.Through41, cal.Isolation41, cal.Reflect41,
-                                S.S[0][3], cal.Through14, cal.Isolation14, cal.Reflect14,
-                                S.S[0][0], cal.P1Short, cal.P1Open, cal.P1Load,
-                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                            &Sc1, &Sc2, &Sc3, &Sc4);
-
-        if(index1==3&&index2==0)Sc=Sc1;
-        if(index1==0&&index2==3)Sc=Sc2;	}
-	if(cal.P23ThroughDone)
-	{
-        vector<complex_t> Sc1, Sc2, Sc3, Sc4;
-        if((index1==2&&index2==1)||(index1==1&&index2==2))
-            ThroughIsolationCal(S.S[2][1], cal.Through32, cal.Isolation32, cal.Reflect32,
-                                S.S[1][2], cal.Through23, cal.Isolation23, cal.Reflect23,
-                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
-                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,cal.f,
-                            &Sc1, &Sc2, &Sc3, &Sc4);
-
-        if(index1==2&&index2==1)Sc=Sc1;
-        if(index1==1&&index2==2)Sc=Sc2;	}
-	if(cal.P24ThroughDone)
-	{
-        vector<complex_t> Sc1, Sc2, Sc3, Sc4;
-        if((index1==3&&index2==1)||(index1==1&&index2==3))
-            ThroughIsolationCal(S.S[3][1], cal.Through42, cal.Isolation42, cal.Reflect42,
-                                S.S[1][3], cal.Through24, cal.Isolation24, cal.Reflect24,
-                                S.S[1][1], cal.P2Short, cal.P2Open, cal.P2Load,
-                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                            &Sc1, &Sc2, &Sc3, &Sc4);
-
-        if(index1==3&&index2==1)Sc=Sc1;
-        if(index1==1&&index2==3)Sc=Sc2;	}
-	if(cal.P34ThroughDone)
-	{
-        vector<complex_t> Sc1, Sc2, Sc3, Sc4;
-        if((index1==3&&index2==2)||(index1==2&&index2==3))
-            ThroughIsolationCal(S.S[3][2], cal.Through43, cal.Isolation43, cal.Reflect43,
-                                S.S[2][3], cal.Through34, cal.Isolation34, cal.Reflect34,
-                                S.S[2][2], cal.P3Short, cal.P3Open, cal.P3Load,
-                                S.S[3][3], cal.P4Short, cal.P4Open, cal.P4Load,cal.f,
-                            &Sc1, &Sc2, &Sc3, &Sc4);
-
-        if(index1==3&&index2==2)Sc=Sc1;
-        if(index1==2&&index2==3)Sc=Sc2;	}
-	
-	return Sc;
-}
 
 
 cal_t CalSpar::DefaultCal(double startfreq,double stopfreq,int NOP)

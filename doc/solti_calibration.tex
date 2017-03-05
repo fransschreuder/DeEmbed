@@ -207,9 +207,9 @@ S_{11}=
 	\left(\begin{split}
 	\frac{S_{11M}-e_{44}}{e_{14}e_{41}}
 	\left[ 1+\frac{S_{22M}-e_{55}}{e_{25}e_{52}}e_{22}\right]
-	\left[ 1+\frac{S_{33M}-e_{66}}{e_{26}e_{62}}e_{33}\right]-\\
+	\left[ 1+\frac{S_{33M}-e_{66}}{e_{36}e_{63}}e_{33}\right]-\\
 	e'_{22}\frac{S_{21M}-e_{54}}{e_{14}e_{52}}\frac{S_{12M}-e_{45}}{e_{25}e_{41}}-\\
-	e'_{33}\frac{S_{31M}-e_{64}}{e_{14}e_{62}}\frac{S_{13M}-e_{46}}{e_{26}e_{41}}	
+	e'_{33}\frac{S_{31M}-e_{64}}{e_{14}e_{63}}\frac{S_{13M}-e_{46}}{e_{36}e_{41}}	
 	\end{split}\right)
 	} {D}
 \end{equation}
@@ -222,7 +222,7 @@ S_{22}=
 	\left[ 1+\frac{S_{11M}-e_{44}}{e_{14}e_{41}}e_{11}\right]
 	\left[ 1+\frac{S_{33M}-e_{66}}{e_{36}e_{63}}e_{33}\right]-\\
 	e'_{11}\frac{S_{12M}-e_{45}}{e_{25}e_{41}}\frac{S_{21M}-e_{54}}{e_{14}e_{52}}-\\
-	e''_{33}\frac{S_{31M}-e_{64}}{e_{14}e_{62}}\frac{S_{13M}-e_{46}}{e_{26}e_{41}}	
+	e''_{33}\frac{S_{31M}-e_{64}}{e_{14}e_{63}}\frac{S_{13M}-e_{46}}{e_{36}e_{41}}	
 	\end{split}\right)
 } {D}
 \end{equation}
@@ -340,7 +340,7 @@ e''_{11} = \frac{\frac{S_{33t}}{S_{13s}}-e_{66}}{\frac{S_{33t}}{S_{13s}}e_{22}-\
 \end{equation}
 \begin{equation}
 \label{eqn:e'22_3p}
-e'_{22} = \frac{\frac{S_{11}}{S_{21s}}-e_{44}}{\frac{S_{11t}}{S_{21s}}e_{11}-\Delta_{eP1}}
+e'_{22} = \frac{\frac{S_{11t}}{S_{21s}}-e_{44}}{\frac{S_{11t}}{S_{21s}}e_{11}-\Delta_{eP1}}
 \end{equation}
 \begin{equation}
 \label{eqn:e''22_3p}
@@ -370,16 +370,16 @@ e_{14}e_{63} = \left(\frac{S_{31t}}{S_{31s}} - e_{64}\right)\left(1-e_{11}e'_{33
 \end{equation}
 \begin{equation}
 \label{eqn:e36e41_3p}
-e_{36}e_{41} = \left(\frac{S_{13t}}{S_{13s}} - e_{46}\right)\left(1-e_{33}e'_{11}\right)
+e_{36}e_{41} = \left(\frac{S_{13t}}{S_{13s}} - e_{46}\right)\left(1-e_{33}e''_{11}\right)
 \end{equation}
 
 \begin{equation}
 \label{eqn:e25e63_3p}
-e_{25}e_{63} = \left(\frac{S_{32t}}{S_{32s}} - e_{65}\right)\left(1-e_{22}e'_{33}\right)
+e_{25}e_{63} = \left(\frac{S_{32t}}{S_{32s}} - e_{65}\right)\left(1-e_{22}e''_{33}\right)
 \end{equation}
 \begin{equation}
 \label{eqn:e36e52_3p}
-e_{36}e_{52} = \left(\frac{S_{23t}}{S_{23s}} - e_{56}\right)\left(1-e_{33}e'_{22}\right)
+e_{36}e_{52} = \left(\frac{S_{23t}}{S_{23s}} - e_{56}\right)\left(1-e_{33}e''_{22}\right)
 \end{equation}
 
 
