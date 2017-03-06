@@ -291,18 +291,18 @@ void CalSpar::ThreePortCal(                    vector<complex_t> rawS12, vector<
                         (complex_t(1,0)+((rawS33[i]-e66)/(e36e63)*e33))
                         -(ee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41)))
                         -(ee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
-#warning TODO  S22 and S33
-        (*calS22)[i] = (((rawS11[i]-e44)/(e14e41))*
-                        (complex_t(1,0)+((rawS22[i]-e55)/(e25e52)*e22))*
-                        (complex_t(1,0)+((rawS33[i]-e66)/(e36e63)*e33))
-                        -(ee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41)))
-                        -(ee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
 
-        (*calS33)[i] = (((rawS11[i]-e44)/(e14e41))*
-                        (complex_t(1,0)+((rawS22[i]-e55)/(e25e52)*e22))*
+        (*calS22)[i] = (((rawS22[i]-e55)/(e25e52))*
+                        (complex_t(1,0)+((rawS11[i]-e44)/(e14e41)*e11))*
                         (complex_t(1,0)+((rawS33[i]-e66)/(e36e63)*e33))
-                        -(ee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41)))
-                        -(ee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
+                        -(ee11 * ((rawS12[i]-e45)/(e25e41))*((rawS21[i]-e54)/(e14e52)))
+                        -(eee33 * ((rawS31[i]-e64)/(e14e63))*((rawS13[i]-e46)/(e36e41))) )/ D;
+
+        (*calS33)[i] = (((rawS33[i]-e66)/(e36e63))*
+                        (complex_t(1,0)+((rawS11[i]-e44)/(e14e41)*e11))*
+                        (complex_t(1,0)+((rawS22[i]-e55)/(e25e52)*e22))
+                        -(eee11 * ((rawS12[i]-e45)/(e25e41))*((rawS21[i]-e54)/(e14e52)))
+                        -(eee22 * ((rawS21[i]-e54)/(e14e52))*((rawS12[i]-e45)/(e25e41))) )/ D;
 
 
     }
