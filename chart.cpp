@@ -826,19 +826,21 @@ spar_t Chart::TrimSpar(spar_t spar, double startfreq, double stopfreq, int NOP)
     if(spar.S.size()>2)
     {
         sp2  = Spline<double, complex_t>(spar.f, spar.S[0][2]);
-        sp3  = Spline<double, complex_t>(spar.f, spar.S[0][3]);
         sp6  = Spline<double, complex_t>(spar.f, spar.S[1][2]);
-        sp7  = Spline<double, complex_t>(spar.f, spar.S[1][3]);
         sp8  = Spline<double, complex_t>(spar.f, spar.S[2][0]);
         sp9  = Spline<double, complex_t>(spar.f, spar.S[2][1]);
         sp10 = Spline<double, complex_t>(spar.f, spar.S[2][2]);
+    }
+    if(spar.S.size()>3)
+    {
+        sp3  = Spline<double, complex_t>(spar.f, spar.S[0][3]);
+        sp7  = Spline<double, complex_t>(spar.f, spar.S[1][3]);
         sp11 = Spline<double, complex_t>(spar.f, spar.S[2][3]);
         sp12 = Spline<double, complex_t>(spar.f, spar.S[3][0]);
         sp13 = Spline<double, complex_t>(spar.f, spar.S[3][1]);
         sp14 = Spline<double, complex_t>(spar.f, spar.S[3][2]);
         sp15 = Spline<double, complex_t>(spar.f, spar.S[3][3]);
     }
-
 
     for(int i=0;i<(int)spar.S.size();i++)
     {
@@ -874,12 +876,15 @@ spar_t Chart::TrimSpar(spar_t spar, double startfreq, double stopfreq, int NOP)
                 if(spar.S.size()>2)
                 {
                     temp_spar.S[0][2][i]=(sp2[temp_spar.f[i]]);
-                    temp_spar.S[0][3][i]=(sp3[temp_spar.f[i]]);
                     temp_spar.S[1][2][i]=(sp6[temp_spar.f[i]]);
-                    temp_spar.S[1][3][i]=(sp7[temp_spar.f[i]]);
                     temp_spar.S[2][0][i]=(sp8[temp_spar.f[i]]);
                     temp_spar.S[2][1][i]=(sp9[temp_spar.f[i]]);
                     temp_spar.S[2][2][i]=(sp10[temp_spar.f[i]]);
+                }
+                if(spar.S.size()>3)
+                {
+                    temp_spar.S[0][3][i]=(sp3[temp_spar.f[i]]);
+                    temp_spar.S[1][3][i]=(sp7[temp_spar.f[i]]);
                     temp_spar.S[2][3][i]=(sp11[temp_spar.f[i]]);
                     temp_spar.S[3][0][i]=(sp12[temp_spar.f[i]]);
                     temp_spar.S[3][1][i]=(sp13[temp_spar.f[i]]);
